@@ -1,11 +1,21 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import gettext_lazy as _
+from ckeditor.widgets import CKEditorWidget
+
+
+class FlatPageAdminForm(forms.ModelForm):
+    title = forms.CharField(label='Заголовок', max_length=200)
+    content = forms.CharField(label='Текст страницы', widget=CKEditorWidget())
 
 
 # Define a new FlatPageAdmin
 class FlatPageAdmin(FlatPageAdmin):
+
+    form = FlatPageAdminForm
+
     fieldsets = (
         (None, {'fields': ('url', 'title', 'content', 'sites')}),
         (_('Advanced options'), {
