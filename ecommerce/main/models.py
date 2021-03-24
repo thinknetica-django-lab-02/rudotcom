@@ -1,2 +1,79 @@
 from django.db import models
+from mptt.models import MPTTModel, TreeForeignKey
+from django.utils.html import mark_safe
 
+
+class Vendor(models.Model):
+
+    name = models.CharField(max_length=64, unique=True)
+    phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
+    address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
+
+    class Meta:
+        verbose_name = 'Продавец'
+        verbose_name_plural = '[ Продавцы ]'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Category(MPTTModel):
+
+    name = models.CharField(max_length=64, unique=False)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    slug = models.SlugField(unique=True)
+
+    @property
+    def parent_name(self):
+        return self.parent.name if self.parent else ''
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = '[ Категории ]'
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    def __str__(self):
+        return f"{self.parent_name} > {self.name}"
+
+
+class Tag(models.Model):
+    string = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.string
+
+
+class Item(models.Model):
+    category = models.ForeignKey(Category, verbose_name='Категория', null=False, default=1, on_delete=models.CASCADE)
+    tag = models.ManyToManyField(Tag, verbose_name='Тэг')
+    vendor = models.ForeignKey(Vendor, verbose_name='Продавец', null=False, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255, verbose_name='Наименование')
+    slug = models.SlugField(unique=True)
+    image = models.ImageField(verbose_name='Изображение')
+    description = models.TextField(verbose_name='Описание', null=True)
+    price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')
+    price_discount = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена со скидкой',
+                                         null=True, blank=True)
+    quantity = models.PositiveIntegerField(verbose_name='Наличие', default=0)
+    display = models.BooleanField(verbose_name='Выставлять', default=True,
+                                  blank=False, null=False)
+    date_added = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
+    visits = models.IntegerField(default=0, verbose_name='👁', help_text='Количество просмотров')
+    last_visit = models.DateTimeField(blank=True, null=True, verbose_name='Просмотрен')
+
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" height="50" />' % self.image)
+
+    image_tag.short_description = 'Изображение'
+
+    class Meta:
+        verbose_name = 'Товар'
+        verbose_name_plural = '[ Товары ]'
+        ordering = ('category', 'title',)
+
+    def __str__(self):
+        return self.title

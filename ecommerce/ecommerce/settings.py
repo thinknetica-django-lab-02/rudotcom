@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'main',
+    'mptt',
 ]
 
 SITE_ID = 1
