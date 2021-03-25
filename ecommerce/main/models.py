@@ -12,7 +12,7 @@ class Vendor(models.Model):
 
     class Meta:
         verbose_name = 'Продавец'
-        verbose_name_plural = '[ Продавцы ]'
+        verbose_name_plural = 'Продавцы'
         ordering = ('name',)
 
     def __str__(self):
@@ -31,7 +31,7 @@ class Category(MPTTModel):
 
     class Meta:
         verbose_name = 'Категория'
-        verbose_name_plural = '[ Категории ]'
+        verbose_name_plural = 'Категории'
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -41,7 +41,12 @@ class Category(MPTTModel):
 
 
 class Tag(models.Model):
+
     string = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         return self.string
@@ -72,7 +77,7 @@ class Item(models.Model):
 
     class Meta:
         verbose_name = 'Товар'
-        verbose_name_plural = '[ Товары ]'
+        verbose_name_plural = 'Товары'
         ordering = ('category', 'title',)
 
     def __str__(self):

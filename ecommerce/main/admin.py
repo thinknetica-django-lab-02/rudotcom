@@ -53,7 +53,7 @@ class ItemAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Товар',
          {'fields': ['title', 'category', 'price', 'price_discount', 'quantity', 'vendor',
-                     ('image', 'image_tag',), 'description', 'display', ]}
+                     ('image', 'image_tag',), 'description', 'tag', 'display', ]}
          ),
         ('Служебная информация',
          {'fields': ['slug', 'date_added', 'visits', 'last_visit', ],
