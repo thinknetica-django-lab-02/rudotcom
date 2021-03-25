@@ -12,7 +12,7 @@ class Vendor(models.Model):
 
     class Meta:
         verbose_name = 'Продавец'
-        verbose_name_plural = '[ Продавцы ]'
+        verbose_name_plural = 'Продавцы'
         ordering = ('name',)
 
     def __str__(self):
@@ -31,7 +31,7 @@ class Category(MPTTModel):
 
     class Meta:
         verbose_name = 'Категория'
-        verbose_name_plural = '[ Категории ]'
+        verbose_name_plural = 'Категории'
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -41,7 +41,12 @@ class Category(MPTTModel):
 
 
 class Tag(models.Model):
+
     string = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         return self.string
@@ -53,6 +58,7 @@ class Item(models.Model):
     vendor = models.ForeignKey(Vendor, verbose_name='Продавец', null=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name='Наименование')
     slug = models.SlugField(unique=True)
+    color = models.CharField(max_length=50, verbose_name='Цвет', null=False)
     image = models.ImageField(verbose_name='Изображение')
     description = models.TextField(verbose_name='Описание', null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')
@@ -72,7 +78,7 @@ class Item(models.Model):
 
     class Meta:
         verbose_name = 'Товар'
-        verbose_name_plural = '[ Товары ]'
+        verbose_name_plural = 'Товары'
         ordering = ('category', 'title',)
 
     def __str__(self):

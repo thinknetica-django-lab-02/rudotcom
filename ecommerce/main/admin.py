@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import gettext_lazy as _
-from django.forms import ModelForm, ValidationError
+from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
 from .models import Category, Tag, Vendor, Item
@@ -53,11 +53,14 @@ class ItemAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Товар',
          {'fields': ['title', 'category', 'price', 'price_discount', 'quantity', 'vendor',
-                     ('image', 'image_tag',), 'description', 'display', ]}
+                     ('image', 'image_tag',), 'description', 'tag', 'display', 'color',
+                     ]
+          }
          ),
         ('Служебная информация',
          {'fields': ['slug', 'date_added', 'visits', 'last_visit', ],
-          'classes': ['collapse']}
+          'classes': ['collapse']
+          }
          ),
     ]
     readonly_fields = ['image_tag', 'visits', 'last_visit', 'date_added', ]
