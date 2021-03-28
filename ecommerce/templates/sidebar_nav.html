@@ -1,0 +1,13 @@
+          {% if page_role == 'home' %}
+          <li>Начало</li>
+          {% else %}
+          <li><a href="{% url 'base' %}">Начало</a></li>
+          {% endif %}
+          <li><a href="/about/contact/">Контакты</a></li>
+          <li><a href="/about/delivery/">Доставка</a></li>
+          <li><a href="/about/promotion/">Акции</a></li>
+          {% if turn_on_block %}
+          <li>Turn off - Turn on</li>
+          {% endif %}
+          <li><div>{{ user }}</div></li>
+
