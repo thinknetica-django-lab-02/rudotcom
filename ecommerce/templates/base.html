@@ -33,6 +33,10 @@
       <h3>{% block header %}{% endblock %}</h3>
       {% block content %}
           <p>Главная страница</p>
+          {% if turn_on_block %}
+            <div>Блок, отображаемый переменной turn_on_block </div>
+          {% endif %}
+            <div>{{ request.user }}</div>
       {% endblock %}
       </div>
     </div>

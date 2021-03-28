@@ -5,4 +5,7 @@ from django.views import View
 class BaseView(View):
 
     def get(self, request):
-        return render(request, 'base.html')
+        context = {
+            'turn_on_block': False,
+        }
+        return render(request, 'base.html', context=context)
