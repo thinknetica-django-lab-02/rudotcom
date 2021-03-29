@@ -22,10 +22,11 @@
       <div class="col-sm-2">
       {% block sidebar %}
       <ul class="sidebar-nav">
-          <li><a href="{% url 'base' %}">Начало</a></li>
-          <li><a href="/about/contact/">Контакты</a></li>
-          <li><a href="/about/delivery/">Доставка</a></li>
-          <li><a href="/about/promotion/">Акции</a></li>
+          {% with page_role as page_role %}
+          {% with request.user as user %}
+          {% include 'sidebar_nav.html' %}
+          {% endwith %}
+          {% endwith %}
       </ul>
      {% endblock %}
       </div>
@@ -36,7 +37,7 @@
           {% if turn_on_block %}
             <div>Блок, отображаемый переменной turn_on_block </div>
           {% endif %}
-            <div>{{ request.user }}</div>
+
       {% endblock %}
       </div>
     </div>
