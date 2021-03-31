@@ -17,10 +17,8 @@ class BaseView(View):
 
 
 class ItemView(View):
-    model = Item
     context_object_name = 'item'
     template_name = 'item_detail.html'
-    slug_url_kwarg = 'slug'
 
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
@@ -35,6 +33,9 @@ class ItemView(View):
 
 
 class CategoryItemsView(ListView):
+    model = Item
+    template_name = 'category.html'
+    paginate_by = 2
 
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
@@ -46,7 +47,7 @@ class CategoryItemsView(ListView):
             'page_role': 'goods',
             'items': items,
         }
-        return render(request, 'category.html', context=context)
+        return render(request, self.template_name, context=context)
 
 
 class ProfileView(View):

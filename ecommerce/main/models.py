@@ -84,3 +84,19 @@ class Item(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Delivery(models.Model):
+    """ Условия доставки разных типов и условия бесплатной доставки """
+
+    title = models.CharField(max_length=255, verbose_name='Тип доставки')
+    price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Стоимость')
+    free = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Бесплатно при сумме')
+    description = models.TextField(verbose_name='Описание', null=True)
+
+    class Meta:
+        verbose_name = 'Доставка'
+        verbose_name_plural = 'Условия доставки'
+
+    def __str__(self):
+        return f'{self.title} {self.price}р до {self.free}'
