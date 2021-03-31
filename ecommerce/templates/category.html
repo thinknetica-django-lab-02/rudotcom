@@ -5,5 +5,10 @@
 {% block header %}  {{ category }} {% endblock %}}
 
 {% block content %}
+    <ul>
+        {% for item in items %}
+            <li><a href="/item/{{ item.slug }}">{{ item.title }}</a></li>
+        {% endfor %}
+    </ul>
 
 {% endblock %}}

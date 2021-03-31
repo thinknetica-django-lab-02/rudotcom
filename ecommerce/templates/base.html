@@ -48,11 +48,7 @@
       <div class="col-sm-2">
      {% block sidebar %}
       <ul class="sidebar-nav">
-          {% with page_role as page_role %}
-          {% with request.user as user %}
-          {% include 'sidebar_nav.html' %}
-          {% endwith %}
-          {% endwith %}
+          {% include 'sidebar_nav.html' with category=category user=request.user page_role=page_role %}
       </ul>
      {% endblock %}
       </div>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %} Категории {% endblock %}}
+
+{% block header %}  {{ category }} {% endblock %}}
+
+{% block content %}
+  <h1>Title: {{ item.title }}</h1>
+
+  <p><strong>Продавец:</strong> <a href="/vendor/{{ item.vendor.slug }}/">{{ item.vendor }}</a></p> <!-- author detail link not yet defined -->
+  <p><strong>Цвет:</strong> {{ item.color }}</p>
+  <p><strong>Цена:</strong> {{ item.price }}</p>
+  <p><strong>Цена:</strong> {{ item.price_discount }}</p>
+  <p><strong>Изображение:</strong> <img src="/media/{{ item.image }}" width=200></p>
+  <p><strong>Теги:</strong>
+      {% for tag in item.tag.all %}
+      {{ tag }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}</p>
+
+
+{% endblock %}}

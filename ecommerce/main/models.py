@@ -9,6 +9,7 @@ class Vendor(models.Model):
     phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
     address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
     started_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
+    slug = models.SlugField(unique=True)
 
     class Meta:
         verbose_name = 'Продавец'

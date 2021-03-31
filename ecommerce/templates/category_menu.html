@@ -2,7 +2,11 @@
 {% load mptt_tags %}
     {% recursetree categories %}
         <li>
+            {% if node.slug == category.slug %}
+            {{ node.name }}
+            {% else %}
             <a href="/category/{{ node.slug }}/">{{ node.name }}</a>
+            {% endif %}
             {% if not node.is_leaf_node %}
                 <ul class="children">
                     {{ children }}

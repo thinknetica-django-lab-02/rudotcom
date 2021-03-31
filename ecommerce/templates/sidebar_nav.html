@@ -3,7 +3,7 @@
           {% else %}
           <li><a href="{% url 'base' %}">Товары</a></li>
           {% endif %}
-          {% include 'category_menu.html' %}
+          {% include 'category_menu.html' with category=category %}
           <li><a href="/about/contact/">Контакты</a></li>
           <li><a href="/about/delivery/">Доставка</a></li>
           <li><a href="/about/promotion/">Акции</a></li>
