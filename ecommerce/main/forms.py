@@ -17,4 +17,3 @@ class UserForm(forms.ModelForm):
             'email': 'Адрес email',
             'username': 'Ник',
         }
-
