@@ -47,10 +47,15 @@ class ItemListView(ListView):
     template_name = 'item_list.html'
     paginate_by = 2
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = self.request.GET.get('tag')
+        context['tag'] = tag
+        return context
+
     def get_queryset(self):
         query = self.request.GET.get('tag')
-        print(query)
-        object_list = self.model.objects.filter(tag=query)
+        object_list = Item.objects.filter(tag__string=query)
 
         return object_list
 
