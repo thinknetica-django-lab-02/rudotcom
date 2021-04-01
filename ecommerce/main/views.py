@@ -34,15 +34,25 @@ class CategoryItemsView(ListView):
     template_name = 'category.html'
     paginate_by = 2
 
-    def get(self, request, *args, **kwargs):
-        slug = kwargs.get('slug')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs['slug']
         category = Category.objects.get(slug=slug)
-        items = Item.objects.filter(Q(category=category) | Q(category__parent=category))
-        context = {
-            'category': category,
-            'items': items,
-        }
-        return render(request, self.template_name, context=context)
+        context['category'] = category
+        return context
+
+
+class ItemListView(ListView):
+    model = Item
+    template_name = 'item_list.html'
+    paginate_by = 2
+
+    def get_queryset(self):
+        query = self.request.GET.get('tag')
+        print(query)
+        object_list = self.model.objects.filter(tag=query)
+
+        return object_list
 
 
 class ArticleView(DetailView):

@@ -21,5 +21,10 @@ def category_list():
 
 
 @register.simple_tag
+def current_category(slug):
+    return Category.objects.get(slug=slug)
+
+
+@register.simple_tag
 def article_list():
     return Article.objects.all()
