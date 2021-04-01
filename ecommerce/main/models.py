@@ -1,3 +1,6 @@
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
@@ -5,6 +8,12 @@ from django.utils.html import mark_safe
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+
+def is_adult(value):
+    adult_age = value + relativedelta(years=18)
+    if adult_age > datetime.now().date():  # if adult age is in future
+        raise ValidationError('Возраст должен быть не менее 18 лет')
 
 
 class Vendor(models.Model):
@@ -133,7 +142,7 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    birthday = models.DateField(verbose_name='День рождения')
+    birthday = models.DateField(verbose_name='Дата рождения', validators=[is_adult])
 
     def __str__(self):
         return self.user.username

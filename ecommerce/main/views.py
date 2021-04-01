@@ -128,11 +128,14 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                 user.delete()
                 profile.delete()
             else:
+                """ 
+                TODO: Сделать валидацию возраста
+                """
                 profile.birthday = formset.cleaned_data[0]['birthday']
                 profile.save()
 
         else:
-            messages.add_message(request, messages.ERROR, formset.errors[0]['user'])
+            messages.add_message(request, messages.ERROR, formset.errors[0])
 
         return HttpResponseRedirect('/account/profile/')
 
