@@ -10,12 +10,11 @@ urlpatterns = [
     path('item/<str:slug>/', views.ItemView.as_view(), name='item'),
     path('items/', views.ItemListView.as_view(), name='items'),
     path('category/<str:slug>/', views.CategoryItemsView.as_view(), name='category'),
-    path('profile/', views.ProfileView.as_view(), name='profile'),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(next_page="/account/profile/"), name='logout'),
-    path('registration/', views.RegistrationView.as_view(), name='registration'),
-    path('cart/', views.CartView.as_view(), name='cart'),
     path('account/profile/', views.ProfileView.as_view(), name='profile'),
+    path('account/login/', views.LoginView.as_view(), name='login'),
+    path('account/logout/', LogoutView.as_view(next_page="/account/profile/"), name='logout'),
+    path('account/registration/', views.RegistrationView.as_view(), name='registration'),
+    path('cart/', views.CartView.as_view(), name='cart'),
 ]
 
 if settings.DEBUG:

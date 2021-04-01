@@ -5,9 +5,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView, UpdateView
 
-from .forms import UserForm
+from .forms import UserForm, LoginForm
 from .models import Category, Item, Article, Profile
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 
 User = get_user_model()
 
@@ -81,7 +81,7 @@ class ArticleView(DetailView):
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):
-    login_url = "/admin/login/?next=/account/profile/"
+    login_url = "/account/login/"
     model = Profile
     context_object_name = 'profile'
     template_name = 'main/account_profile.html'
@@ -138,14 +138,34 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
 
 class LoginView(View):
-    """ Форма авторизации пользователя """
-    pass
+    template_name = 'main/account_login.html'
 
+    def get(self, request, *args, **kwargs):
+        form = LoginForm(request.POST or None)
+        context = {
+            'form': form,
+            'page_role': 'login',
+        }
+        return render(request, self.template_name, context)
 
-class LogoutView(View):
-    """ Логаут """
-    next_page = None
-    pass
+    def post(self, request, *args, **kwargs):
+
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(
+                username=username, password=password
+            )
+            if user:
+                login(request, user)
+                return HttpResponseRedirect('/account/profile/')
+
+        context = {
+            'form': form,
+            'page_role': 'login',
+        }
+        return render(request, self.template_name, context)
 
 
 class RegistrationView(View):
