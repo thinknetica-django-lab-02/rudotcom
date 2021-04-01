@@ -2,6 +2,7 @@
 {% category_list as categories %}
 
 {% load mptt_tags %}
+      <div class="col-sm-2">
       <ul class="sidebar-nav">
     {% recursetree categories %}
         <li>
@@ -25,3 +26,4 @@
         <li><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></li>
           {% endfor %}
       </ul>
+      </div>

@@ -14,6 +14,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(next_page="/"), name='logout'),
     path('registration/', views.RegistrationView.as_view(), name='registration'),
     path('cart/', views.CartView.as_view(), name='cart'),
+    path('account/profile/', views.ProfileView.as_view(), name='profile'),
 ]
 
 if settings.DEBUG:

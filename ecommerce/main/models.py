@@ -2,6 +2,9 @@ from django.db import models
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Vendor(models.Model):
@@ -119,4 +122,16 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    birthday = models.DateField(verbose_name='День рождения')
+
+    def __str__(self):
+        return self.user.username
 

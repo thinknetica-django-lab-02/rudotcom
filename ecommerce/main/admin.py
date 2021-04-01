@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Category, Tag, Vendor, Item, Article
+from .models import Category, Tag, Vendor, Item, Article, Profile
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -61,6 +61,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
 admin.site.site_header = "Панель управления магазина INTROVERT"
 admin.site.unregister(Group)
+admin.site.register(Profile)
 admin.site.register(Vendor)
 admin.site.register(Tag)
 admin.site.register(Category, CategoryAdmin)
