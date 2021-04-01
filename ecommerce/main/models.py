@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
 
@@ -100,3 +101,22 @@ class Delivery(models.Model):
 
     def __str__(self):
         return f'{self.title} {self.price}р до {self.free}'
+
+
+class Article(models.Model):
+    class Meta:
+        verbose_name = 'Страница'
+        verbose_name_plural = 'Страницы'
+        ordering = ('id',)
+
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
+    name = models.CharField(max_length=50, verbose_name='Пункт меню', null=False, blank=True)
+    slug = models.SlugField(unique=True, null=False)
+    content = models.TextField(verbose_name='Текст страницы', null=True)
+
+    def get_absolute_url(self):
+        return reverse('article', kwargs={'slug': self.slug})
+
+    def __str__(self):
+        return self.title
+

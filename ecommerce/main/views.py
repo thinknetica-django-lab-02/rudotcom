@@ -2,16 +2,14 @@ import datetime
 
 from django.db.models import Q
 from django.shortcuts import render
-from django.views.generic import ListView, View
-from .models import Category, Item
+from django.views.generic import ListView, View, DetailView
+from .models import Category, Item, Article
 
 
 class BaseView(View):
 
     def get(self, request):
         context = {
-            'categories': Category.objects.all(),
-            'page_role': 'goods',
         }
         return render(request, 'base.html', context=context)
 
@@ -26,7 +24,6 @@ class ItemView(View):
         category = item.category
         context = {
             'category': category,
-            'categories': Category.objects.all(),
             'item': item,
         }
         return render(request, self.template_name, context=context)
@@ -43,11 +40,21 @@ class CategoryItemsView(ListView):
         items = Item.objects.filter(Q(category=category) | Q(category__parent=category))
         context = {
             'category': category,
-            'categories': Category.objects.all(),
-            'page_role': 'goods',
             'items': items,
         }
         return render(request, self.template_name, context=context)
+
+
+class ArticleView(DetailView):
+    model = Article
+    context_object_name = 'article'
+    template_name = 'article_detail.html'
+    slug_url_kwarg = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = Article.objects.all()
+        return context
 
 
 class ProfileView(View):

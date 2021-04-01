@@ -47,9 +47,9 @@
     <div class="row">
       <div class="col-sm-2">
      {% block sidebar %}
-      <ul class="sidebar-nav">
-          {% include 'sidebar_nav.html' with category=category user=request.user page_role=page_role %}
-      </ul>
+
+          {% include 'sidebar_nav.html' %}
+
      {% endblock %}
       </div>
       <div class="col-sm-10 ">
@@ -64,7 +64,6 @@
               <li>{{ the_time }}</li>
               <li>{{ 'Довод'|reverse_string }}</li>
           </ul>
-
       {% endblock %}
       </div>
     </div>

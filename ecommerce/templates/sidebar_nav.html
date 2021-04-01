@@ -1,9 +1,27 @@
-          {% if page_role == 'goods' %}
-          Товары
-          {% else %}
-          <li><a href="{% url 'base' %}">Товары</a></li>
-          {% endif %}
-          {% include 'category_menu.html' with category=category %}
-          <li><a href="/about/contact/">Контакты</a></li>
-          <li><a href="/about/delivery/">Доставка</a></li>
-          <li><a href="/about/promotion/">Акции</a></li>
+{% load main_extras %}
+{% category_list as categories %}
+
+{% load mptt_tags %}
+      <ul class="sidebar-nav">
+    {% recursetree categories %}
+        <li>
+            {% if node.slug == category.slug %}
+            {{ node.name }}
+            {% else %}
+            <a href="/category/{{ node.slug }}/">{{ node.name }}</a>
+            {% endif %}
+            {% if not node.is_leaf_node %}
+                <ul class="children">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endrecursetree %}
+      </ul>
+    <hr>
+{% article_list as articles %}
+      <ul class="article-menu">
+          {% for item in articles %}
+        <li><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></li>
+          {% endfor %}
+      </ul>
