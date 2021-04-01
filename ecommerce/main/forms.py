@@ -6,13 +6,12 @@ User = get_user_model()
 
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
     email = forms.EmailField(widget=forms.EmailInput)
 
     class Meta:
         model = User
 
-        fields = ('last_name', 'first_name', 'email', 'username', 'password')
+        fields = ('last_name', 'first_name', 'email', 'username', )
         labels = {
             'email': 'Адрес email',
             'username': 'Ник',

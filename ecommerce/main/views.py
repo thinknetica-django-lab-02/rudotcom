@@ -109,30 +109,31 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         if not request.user.is_authenticated:
             return HttpResponseRedirect(self.login_url)
 
-        form = UserForm(request.POST or None)
-        formset = self.ProfileFormSet(request.POST or None)
+        user = User.objects.get(username=request.user.username)
+        form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
+        formset = self.ProfileFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
 
         if form.is_valid():
-            user = request.user
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
             user.username = form.cleaned_data['username']
-            if form.cleaned_data['passowrd']:
-                user.password = form.cleaned_data['password']
             user.email = form.cleaned_data['email']
             user.save()
         else:
-            messages.add_message(request, messages.ERROR, form.errors)
+            messages.add_message(request, messages.ERROR, form.errors['username'])
+
         if formset.is_valid():
             profile = Profile.objects.get(user=user)
-            profile.birthday = formset.cleaned_data['birthday']
-            profile.save()
-        else:
-            messages.add_message(request, messages.ERROR, formset.errors)
+            if formset.cleaned_data[0]['DELETE']:
+                user.delete()
+                profile.delete()
+            else:
+                profile.birthday = formset.cleaned_data[0]['birthday']
+                profile.save()
 
-        context = {
-            'form': form,
-            'formset': formset,
-            'page_role': 'profile',
-        }
+        else:
+            messages.add_message(request, messages.ERROR, formset.errors[0]['user'])
+
         return HttpResponseRedirect('/account/profile/')
 
 
