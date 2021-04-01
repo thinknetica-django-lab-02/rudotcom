@@ -1,9 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView, View, DetailView
+from django.views.generic import ListView, View, DetailView, UpdateView
 
-from .forms import ProfileForm
+from .forms import UserForm
 from .models import Category, Item, Article, Profile
 from django.contrib.auth import get_user_model
 
@@ -42,7 +43,9 @@ class CategoryItemsView(ListView):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs['slug']
         category = Category.objects.get(slug=slug)
+        items = Item.objects.filter(category=category)
         context['category'] = category
+        context['items'] = items
         return context
 
 
@@ -76,25 +79,27 @@ class ArticleView(DetailView):
         return context
 
 
-class ProfileView(View):
+class ProfileView(LoginRequiredMixin, UpdateView):
+    login_url = "/admin/login/?next=/account/profile/"
     model = Profile
     context_object_name = 'profile'
-    template_name = 'account_profile.html'
-    ProfileFormSet = inlineformset_factory(User, Profile, fields=('birthday',))
+    template_name = 'main/account_profile.html'
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return HttpResponseRedirect('/account/login/')
+            return HttpResponseRedirect(self.login_url)
 
-        form = ProfileForm(request.POST or None)
+        ProfileFormSet = inlineformset_factory(User, Profile, fields=('birthday',))
         user = self.request.user
-        profile = self.model.objects.get(user=user)
+        form = UserForm(instance=user)
+        fromset = ProfileFormSet(instance=user)
+
         return render(
             request,
-            'account_profile.html',
+            self.template_name,
             {
                 'form': form,
-                'profile': profile,
+                'formset': fromset,
                 'page_role': 'profile',
             }
         )
@@ -103,7 +108,7 @@ class ProfileView(View):
         user = self.request.user
         formset = self.ProfileFormSet(instance=user)
 
-        return render(request, 'account_profile.html', {'formset': formset})
+        return render(request, 'main/account_profile.html', {'formset': formset})
 
 
 class LoginView(View):

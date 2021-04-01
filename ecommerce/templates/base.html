@@ -33,7 +33,7 @@
                 <li><a href="{% url 'login' %}"{% if page_role == 'login' %} class="active"{% endif %}>Войти</a></li>
                 <li><a href="{% url 'registration' %}"{% if page_role == 'registration' %} class="active"{% endif %}>Регистрация</a></li>
             {% else %}
-                <li><a href="{% url 'profile' %}"{% if page_role == 'profile' %} class="active"{% endif %}>Личный Кабинет {{ request.user }}</a><a href="{% url 'logout' %}" title="Выйти"><i class="fa fa-sign-out"></i></a></li>
+                <li><a href="{% url 'profile' %}"{% if page_role == 'profile' %} class="active"{% endif %}>Личный Кабинет {{ request.user }}</a><a href="{% url 'logout' %}" title="Выйти"><i class="fa fa-sign-out">Выйти</i></a></li>
             {% endif %}
               </ul>
             </nav>

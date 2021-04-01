@@ -89,6 +89,9 @@ class Item(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('item', kwargs={'slug': self.slug})
+
 
 class Delivery(models.Model):
     """ Условия доставки разных типов и условия бесплатной доставки """
