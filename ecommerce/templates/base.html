@@ -41,6 +41,30 @@
         </div>
       </div>
     </div>
+    {% if messages %}
+          <div class="toast fade show" style="position: absolute; right: 50px;">
+            <div class="toast-header">
+              <strong class="mr-auto">Внимание</strong>
+              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true" class="hide-toast">×</span>
+              </button>
+            </div>
+         {% for message in messages %}
+           <div class="toast-body">
+              {{ message|safe }}
+            </div>
+         {% endfor %}
+          </div>
+        <script>
+        $(document).ready(function(){
+            $(".hide-toast").click(function(){
+                $(".toast").toast('hide');
+            });
+        });
+        </script>
+    {% endif %}
+
+
 <hr>
   <div class="container-fluid">
 

@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
@@ -84,31 +85,55 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     model = Profile
     context_object_name = 'profile'
     template_name = 'main/account_profile.html'
+    ProfileFormSet = inlineformset_factory(User, Profile, fields=('birthday',))
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponseRedirect(self.login_url)
 
-        ProfileFormSet = inlineformset_factory(User, Profile, fields=('birthday',))
-        user = self.request.user
+        user = request.user
         form = UserForm(instance=user)
-        fromset = ProfileFormSet(instance=user)
+        formset = self.ProfileFormSet(instance=user)
 
         return render(
             request,
             self.template_name,
             {
                 'form': form,
-                'formset': fromset,
+                'formset': formset,
                 'page_role': 'profile',
             }
         )
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
-        formset = self.ProfileFormSet(instance=user)
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(self.login_url)
 
-        return render(request, 'main/account_profile.html', {'formset': formset})
+        form = UserForm(request.POST or None)
+        formset = self.ProfileFormSet(request.POST or None)
+
+        if form.is_valid():
+            user = request.user
+            user.username = form.cleaned_data['username']
+            if form.cleaned_data['passowrd']:
+                user.password = form.cleaned_data['password']
+            user.email = form.cleaned_data['email']
+            user.save()
+        else:
+            messages.add_message(request, messages.ERROR, form.errors)
+        if formset.is_valid():
+            profile = Profile.objects.get(user=user)
+            profile.birthday = formset.cleaned_data['birthday']
+            profile.save()
+        else:
+            messages.add_message(request, messages.ERROR, formset.errors)
+
+        context = {
+            'form': form,
+            'formset': formset,
+            'page_role': 'profile',
+        }
+        return HttpResponseRedirect('/account/profile/')
 
 
 class LoginView(View):

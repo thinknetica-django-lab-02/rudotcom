@@ -59,7 +59,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ('name', 'title', 'slug',)
 
 
-admin.site.site_header = "Панель управления магазина INTROVERT"
+admin.site.site_header = "Маркетплейс. Панель управления"
 admin.site.unregister(Group)
 admin.site.register(Profile)
 admin.site.register(Vendor)
