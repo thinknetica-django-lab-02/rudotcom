@@ -29,6 +29,15 @@ def path_and_rename(instance, filename):
     return f'{filename}'
 
 
+def upload_avatar(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{instance.user.username}.{ext}'
+    file_path = os.path.join(settings.MEDIA_ROOT, filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    return f'avatar/{filename}'
+
+
 class Vendor(models.Model):
 
     user = models.OneToOneField(
@@ -41,6 +50,7 @@ class Vendor(models.Model):
     address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
     started_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
     slug = models.SlugField(unique=True)
+    image = models.ImageField(null=True, upload_to=upload_avatar)
 
     class Meta:
         verbose_name = 'Продавец'
@@ -49,6 +59,15 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        image = self.image
+        img = Image.open(image)
+        super().save(*args, **kwargs)
+
+        img.thumbnail((200, 200))
+        img.save(os.path.join(settings.MEDIA_ROOT, image.name))
+
 
 
 class Category(MPTTModel):
@@ -138,7 +157,6 @@ class Item(models.Model):
         super().save(*args, **kwargs)
 
 
-
 class Delivery(models.Model):
     """ Условия доставки разных типов и условия бесплатной доставки """
 
@@ -185,8 +203,16 @@ class Customer(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
+    image = models.ImageField(null=True, upload_to=upload_avatar)
     birthday = models.DateField(verbose_name='Дата рождения', validators=[is_adult])
 
     def __str__(self):
         return self.user.username
 
+    def save(self, *args, **kwargs):
+        image = self.image
+        img = Image.open(image)
+        super().save(*args, **kwargs)
+
+        img.thumbnail((200, 200))
+        img.save(os.path.join(settings.MEDIA_ROOT, image.name))

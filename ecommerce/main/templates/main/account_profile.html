@@ -5,9 +5,9 @@
 {% block header %}  Профиль {{ request.user }} {% endblock %}}
 
 {% block content %}
-
+<img src="/media/{{ avatar }}" align="right">
 <table class="control-form">
-    <form action="" method="POST">
+    <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form }}
         {{ formset }}

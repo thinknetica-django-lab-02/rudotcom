@@ -178,9 +178,12 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         user = request.user
         if Customer.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Customer, fields=('birthday',))
+            FormSet = inlineformset_factory(User, Customer, fields=('birthday', 'image', ))
+            profile = Customer.objects.get(user=user)
+
         if Vendor.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
+            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address', 'image', ))
+            profile = Vendor.objects.get(user=user)
 
         form = UserForm(instance=user)
         formset = FormSet(instance=user)
@@ -189,6 +192,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             request,
             self.template_name,
             {
+                'avatar': profile.image,
                 'form': form,
                 'formset': formset,
                 'page_role': 'profile',
@@ -201,18 +205,18 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         user = User.objects.get(username=request.user.username)
         if Customer.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Customer, fields=('birthday',))
+            FormSet = inlineformset_factory(User, Customer, fields=('birthday', 'image', ))
             profile = Customer.objects.get(user=user)
-            fields = ['birthday']
+            fields = ['birthday', 'image']
         elif Vendor.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
+            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address', 'image', ))
             profile = Vendor.objects.get(user=user)
-            fields = ['name', 'address', 'phone']
+            fields = ['name', 'address', 'phone', 'image']
         else:
             return HttpResponseRedirect('/login/')
 
-        form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
-        formset = FormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
+        form = UserForm(request.POST, request.FILES, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
+        formset = FormSet(request.POST, request.FILES, instance=user)  # Иначе formset не привяжется к экземпляру
 
         if form.is_valid():
             for field in ['first_name', 'last_name', 'username', 'email']:
