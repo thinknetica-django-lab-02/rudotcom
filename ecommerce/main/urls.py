@@ -14,7 +14,7 @@ urlpatterns = [
     path('account/login/', views.LoginView.as_view(), name='login'),
     path('account/logout/', LogoutView.as_view(next_page="/account/profile/"), name='logout'),
     path('account/registration/', views.RegistrationView.as_view(), name='registration'),
-    path('vendor/profile/', views.VendorView.as_view(role='vendor'), name='vendor'),
+    path('vendor/profile/', views.VendorView.as_view(), name='vendor'),
     path('vendor/item/', views.ItemCreate.as_view(), name='item_create'),
     path('cart/', views.CartView.as_view(), name='cart'),
 ]
