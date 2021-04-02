@@ -44,7 +44,7 @@ class CategoryItemsView(ListView):
     def get_queryset(self, **kwargs):
         slug = self.kwargs['slug']
         category = Category.objects.get(slug=slug)
-        object_list = Item.objects.filter(Q(category=category) or Q(category__parent=category))
+        object_list = Item.objects.filter(Q(category=category) | Q(category__parent=category))
 
         return object_list
 
