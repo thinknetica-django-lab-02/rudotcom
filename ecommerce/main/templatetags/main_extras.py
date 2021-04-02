@@ -1,6 +1,6 @@
 import datetime
 from django import template
-from ..models import Category
+from ..models import Category, Article
 
 register = template.Library()
 
@@ -16,5 +16,15 @@ def cut(value):
 
 
 @register.simple_tag
-def categories():
+def category_list():
     return Category.objects.all()
+
+
+@register.simple_tag
+def current_category(slug):
+    return Category.objects.get(slug=slug)
+
+
+@register.simple_tag
+def article_list():
+    return Article.objects.all()

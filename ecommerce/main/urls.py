@@ -1,16 +1,23 @@
 from django.urls import path
-from .views import BaseView, CategoryView, ProfileView, LoginView, LogoutView, RegistrationView, CartView
+from django.contrib.auth.views import LogoutView
+from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
-    path('', BaseView.as_view(), name='base'),
-    path('category/<str:slug>/', CategoryView.as_view(), name='category'),
-    path('profile/', ProfileView.as_view(), name='profile'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(next_page="/"), name='logout'),
-    path('registration/', RegistrationView.as_view(), name='registration'),
-    path('cart/', CartView.as_view(), name='cart'),
+    path('', views.BaseView.as_view(), name='base'),
+    path('about/<str:slug>/', views.ArticleView.as_view(), name='article'),
+    path('item/<str:slug>/', views.ItemView.as_view(), name='item'),
+    path('item/<str:slug>/update/', views.ItemUpdate.as_view(), name='item_update'),
+    path('item/new/', views.ItemCreate.as_view(), name='item_create'),
+    path('items/', views.ItemListView.as_view(), name='items'),
+    path('category/<str:slug>/', views.CategoryItemsView.as_view(), name='category'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page="/login/"), name='logout'),
+    path('sign-up/', views.SignUpView.as_view(), name='sign-up'),
+    path('cart/', views.CartView.as_view(), name='cart'),
 ]
 
 if settings.DEBUG:

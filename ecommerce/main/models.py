@@ -1,14 +1,46 @@
+import os
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from PIL import Image
+
+User = get_user_model()
+PRODUCT_BIG = (1100, 3000)
+PRODUCT_CARD = (300, 400)
+PRODUCT_THUMB = (50, 50)
+
+
+def is_adult(value):
+    adult_age = value + relativedelta(years=18)
+    if adult_age > datetime.now().date():  # if adult age is in future
+        raise ValidationError('Возраст должен быть не менее 18 лет')
+
+
+def path_and_rename(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{instance.category.slug}_{instance.slug}.{ext}'
+    os.remove(os.path.join(settings.MEDIA_ROOT, filename))
+    return f'{filename}'
 
 
 class Vendor(models.Model):
 
-    name = models.CharField(max_length=64, unique=True)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    name = models.CharField(max_length=64, unique=True, verbose_name='Наименование')
     phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
     address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
     started_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
+    slug = models.SlugField(unique=True)
 
     class Meta:
         verbose_name = 'Продавец'
@@ -53,13 +85,14 @@ class Tag(models.Model):
 
 
 class Item(models.Model):
+
     category = models.ForeignKey(Category, verbose_name='Категория', null=False, default=1, on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag, verbose_name='Тэг')
+    tag = models.ManyToManyField(Tag, verbose_name='Тэг', blank=True)
     vendor = models.ForeignKey(Vendor, verbose_name='Продавец', null=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name='Наименование')
     slug = models.SlugField(unique=True)
-    color = models.CharField(max_length=50, verbose_name='Цвет', null=False)
-    image = models.ImageField(verbose_name='Изображение')
+    color = models.CharField(max_length=50, verbose_name='Цвет', blank=True)
+    image = models.ImageField(verbose_name='Изображение', upload_to=path_and_rename)
     description = models.TextField(verbose_name='Описание', null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')
     price_discount = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена со скидкой',
@@ -72,7 +105,7 @@ class Item(models.Model):
     last_visit = models.DateTimeField(blank=True, null=True, verbose_name='Просмотрен')
 
     def image_tag(self):
-        return mark_safe('<img src="/media/%s" height="50" />' % self.image)
+        return mark_safe('<img src="/media/thumb/%s" height="50" />' % self.image)
 
     image_tag.short_description = 'Изображение'
 
@@ -83,3 +116,77 @@ class Item(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('item', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        image = self.image
+        img = Image.open(image)
+        ext = image.name.split('.')[-1]
+        filename = f'{self.category.slug}_{self.slug}.{ext}'
+
+        img.thumbnail(PRODUCT_BIG, Image.ANTIALIAS)
+        img.save(os.path.join(settings.MEDIA_ROOT, filename), 'JPEG', quality=95)
+
+        img.thumbnail(PRODUCT_CARD, Image.ANTIALIAS)
+        img.save(os.path.join(settings.MEDIA_ROOT, 'card', filename), 'JPEG', quality=85)
+
+        img.thumbnail(PRODUCT_THUMB)
+        img.save(os.path.join(settings.MEDIA_ROOT, 'thumb', filename))
+
+        super().save(*args, **kwargs)
+
+
+
+class Delivery(models.Model):
+    """ Условия доставки разных типов и условия бесплатной доставки """
+
+    title = models.CharField(max_length=255, verbose_name='Тип доставки')
+    price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Стоимость')
+    free = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Бесплатно при сумме')
+    description = models.TextField(verbose_name='Описание', null=True)
+
+    class Meta:
+        verbose_name = 'Доставка'
+        verbose_name_plural = 'Условия доставки'
+
+    def __str__(self):
+        return f'{self.title} {self.price}р до {self.free}'
+
+
+class Article(models.Model):
+
+    class Meta:
+        verbose_name = 'Страница'
+        verbose_name_plural = 'Страницы'
+        ordering = ('id',)
+
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
+    name = models.CharField(max_length=50, verbose_name='Пункт меню', null=False, blank=True)
+    slug = models.SlugField(unique=True, null=False)
+    content = models.TextField(verbose_name='Текст страницы', null=True)
+
+    def get_absolute_url(self):
+        return reverse('article', kwargs={'slug': self.slug})
+
+    def __str__(self):
+        return self.title
+
+
+class Customer(models.Model):
+
+    class Meta:
+        verbose_name = 'Покупатель'
+        verbose_name_plural = 'Покупатели'
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    birthday = models.DateField(verbose_name='Дата рождения', validators=[is_adult])
+
+    def __str__(self):
+        return self.user.username
+
