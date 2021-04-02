@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -37,17 +38,15 @@ class ItemView(View):
 
 class CategoryItemsView(ListView):
     model = Item
-    template_name = 'category.html'
+    template_name = 'main/category.html'
     paginate_by = 2
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_queryset(self, **kwargs):
         slug = self.kwargs['slug']
         category = Category.objects.get(slug=slug)
-        items = Item.objects.filter(category=category)
-        context['category'] = category
-        context['items'] = items
-        return context
+        object_list = Item.objects.filter(Q(category=category) or Q(category__parent=category))
+
+        return object_list
 
 
 class ItemListView(ListView):
