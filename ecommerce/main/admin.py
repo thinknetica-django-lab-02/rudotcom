@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Category, Tag, Vendor, Item, Article, Profile
+from .models import Category, Tag, Vendor, Item, Article, Customer
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -61,7 +61,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
 admin.site.site_header = "Маркетплейс. Панель управления"
 admin.site.unregister(Group)
-admin.site.register(Profile)
+admin.site.register(Customer)
 admin.site.register(Vendor)
 admin.site.register(Tag)
 admin.site.register(Category, CategoryAdmin)

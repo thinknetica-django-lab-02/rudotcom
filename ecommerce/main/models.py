@@ -18,6 +18,11 @@ def is_adult(value):
 
 class Vendor(models.Model):
 
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
     name = models.CharField(max_length=64, unique=True)
     phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
     address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
@@ -68,11 +73,11 @@ class Tag(models.Model):
 
 class Item(models.Model):
     category = models.ForeignKey(Category, verbose_name='Категория', null=False, default=1, on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag, verbose_name='Тэг')
+    tag = models.ManyToManyField(Tag, verbose_name='Тэг', blank=True)
     vendor = models.ForeignKey(Vendor, verbose_name='Продавец', null=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name='Наименование')
     slug = models.SlugField(unique=True)
-    color = models.CharField(max_length=50, verbose_name='Цвет', null=False)
+    color = models.CharField(max_length=50, verbose_name='Цвет', blank=True)
     image = models.ImageField(verbose_name='Изображение')
     description = models.TextField(verbose_name='Описание', null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')
@@ -136,7 +141,7 @@ class Article(models.Model):
         return self.title
 
 
-class Profile(models.Model):
+class Customer(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,

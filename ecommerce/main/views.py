@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView, UpdateView
 
 from .forms import UserForm, LoginForm
-from .models import Category, Item, Article, Profile
+from .models import Category, Item, Article, Customer
 from django.contrib.auth import get_user_model, login, authenticate
 
 User = get_user_model()
@@ -80,12 +80,12 @@ class ArticleView(DetailView):
         return context
 
 
-class ProfileView(LoginRequiredMixin, UpdateView):
+class CustomerView(LoginRequiredMixin, UpdateView):
     login_url = "/account/login/"
-    model = Profile
+    model = Customer
     context_object_name = 'profile'
     template_name = 'main/account_profile.html'
-    ProfileFormSet = inlineformset_factory(User, Profile, fields=('birthday',))
+    CustomerFormSet = inlineformset_factory(User, Customer, fields=('birthday',))
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -93,7 +93,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         user = request.user
         form = UserForm(instance=user)
-        formset = self.ProfileFormSet(instance=user)
+        formset = self.CustomerFormSet(instance=user)
 
         return render(
             request,
@@ -111,7 +111,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         user = User.objects.get(username=request.user.username)
         form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
-        formset = self.ProfileFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
+        formset = self.CustomerFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
 
         if form.is_valid():
             user.first_name = form.cleaned_data['first_name']
@@ -123,16 +123,13 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             messages.add_message(request, messages.ERROR, form.errors['username'])
 
         if formset.is_valid():
-            profile = Profile.objects.get(user=user)
+            customer = Customer.objects.get(user=user)
             if formset.cleaned_data[0]['DELETE']:
                 user.delete()
-                profile.delete()
+                customer.delete()
             else:
-                """ 
-                TODO: Сделать валидацию возраста
-                """
-                profile.birthday = formset.cleaned_data[0]['birthday']
-                profile.save()
+                customer.birthday = formset.cleaned_data[0]['birthday']
+                customer.save()
 
         else:
             messages.add_message(request, messages.ERROR, formset.errors[0])
