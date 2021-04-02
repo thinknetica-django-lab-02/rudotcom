@@ -1,35 +1,10 @@
 from django import forms
 from django.contrib import admin
-from django.contrib.flatpages.admin import FlatPageAdmin
-from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import gettext_lazy as _
-from django.forms import ModelForm, ValidationError
+from django.contrib.auth.models import Group
+from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Category, Tag, Vendor, Item
-
-
-class FlatPageAdminForm(forms.ModelForm):
-    title = forms.CharField(label='Заголовок', max_length=200)
-    content = forms.CharField(label='Текст страницы', widget=CKEditorWidget())
-
-
-# Define a new FlatPageAdmin
-class FlatPageAdmin(FlatPageAdmin):
-
-    form = FlatPageAdminForm
-
-    fieldsets = (
-        (None, {'fields': ('url', 'title', 'content', 'sites')}),
-        (_('Advanced options'), {
-            'classes': ('collapse',),
-            'fields': (
-                'enable_comments',
-                'registration_required',
-                'template_name',
-            ),
-        }),
-    )
+from .models import Category, Tag, Vendor, Item, Article, Customer
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -53,11 +28,14 @@ class ItemAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Товар',
          {'fields': ['title', 'category', 'price', 'price_discount', 'quantity', 'vendor',
-                     ('image', 'image_tag',), 'description', 'display', ]}
+                     ('image', 'image_tag',), 'description', 'tag', 'display', 'color',
+                     ]
+          }
          ),
         ('Служебная информация',
          {'fields': ['slug', 'date_added', 'visits', 'last_visit', ],
-          'classes': ['collapse']}
+          'classes': ['collapse']
+          }
          ),
     ]
     readonly_fields = ['image_tag', 'visits', 'last_visit', 'date_added', ]
@@ -67,11 +45,25 @@ class ItemAdmin(admin.ModelAdmin):
     ordering = ('-date_added', 'title', 'category', 'price', 'quantity')
 
 
+class ArticleAdminForm(forms.ModelForm):
+    title = forms.CharField(label='Заголовок')
+    content = forms.CharField(label='Текст страницы', widget=CKEditorWidget())
+
+
+class ArticleAdmin(admin.ModelAdmin):
+    form = ArticleAdminForm
+
+    fieldsets = (
+        (None, {'fields': ('slug', 'name', 'title', 'content',)}),
+    )
+    list_display = ('name', 'title', 'slug',)
+
+
+admin.site.site_header = "Маркетплейс. Панель управления"
+admin.site.unregister(Group)
+admin.site.register(Customer)
 admin.site.register(Vendor)
 admin.site.register(Tag)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Item, ItemAdmin)
-
-# Re-register FlatPageAdmin
-admin.site.unregister(FlatPage)
-admin.site.register(FlatPage, FlatPageAdmin)
+admin.site.register(Article, ArticleAdmin)
