@@ -1,8 +1,18 @@
 from django import forms
-from .models import Customer
+from .models import Customer, Item
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+
+class ItemCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Item
+        fields = ['title', 'category', 'color', 'image', 'description', 'price', 'tag', 'slug', ]
+        labels = {
+            'title': 'Новый товар',
+        }
 
 
 class UserForm(forms.ModelForm):

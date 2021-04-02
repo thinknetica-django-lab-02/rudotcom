@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView
 
-from .forms import UserForm, LoginForm
+from .forms import UserForm, LoginForm, ItemCreateForm
 from .models import Category, Item, Article, Customer, Vendor
 from django.contrib.auth import get_user_model, login, authenticate
 from django.views.generic.edit import CreateView, UpdateView
@@ -87,63 +87,6 @@ class ArticleView(DetailView):
         return context
 
 
-class CustomerView(LoginRequiredMixin, UpdateView):
-    login_url = "/account/login/"
-    model = Customer
-    context_object_name = 'profile'
-    template_name = 'main/account_profile.html'
-    CustomerFormSet = inlineformset_factory(User, Customer, fields=('birthday',))
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(self.login_url)
-
-        user = request.user
-        form = UserForm(instance=user)
-        formset = self.CustomerFormSet(instance=user)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                'form': form,
-                'formset': formset,
-                'page_role': 'profile',
-            }
-        )
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(self.login_url)
-
-        user = User.objects.get(username=request.user.username)
-        form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
-        formset = self.CustomerFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
-
-        if form.is_valid():
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.username = form.cleaned_data['username']
-            user.email = form.cleaned_data['email']
-            user.save()
-        else:
-            messages.add_message(request, messages.ERROR, form.errors['username'])
-
-        if formset.is_valid():
-            customer = Customer.objects.get(user=user)
-            if formset.cleaned_data[0]['DELETE']:
-                user.delete()
-                customer.delete()
-            else:
-                customer.birthday = formset.cleaned_data[0]['birthday']
-                customer.save()
-
-        else:
-            messages.add_message(request, messages.ERROR, formset.errors[0])
-
-        return HttpResponseRedirect('/account/profile/')
-
-
 class LoginView(View):
     template_name = 'main/login.html'
 
@@ -166,11 +109,7 @@ class LoginView(View):
             )
             if user:
                 login(request, user)
-                print('CUST', )
-                if Customer.objects.filter(user=user).count():
-                    return HttpResponseRedirect('/account/profile/')
-                if Vendor.objects.filter(user=user).count():
-                    return HttpResponseRedirect('/vendor/profile/')
+                return HttpResponseRedirect('/profile/')
             else:
                 return HttpResponseRedirect('/login/')
 
@@ -181,20 +120,66 @@ class LoginView(View):
         return render(request, self.template_name, context)
 
 
-class VendorView(LoginRequiredMixin, UpdateView):
+class ItemCreate(CreateView):
+    template_name = 'main/item_form.html'
+    model = Item
+    fields = ['title', 'category', 'color', 'image', 'description', 'price', 'tag', 'slug',]
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(username=request.user.username)
+        vendor = Vendor.objects.get(user=user)
+        form = ItemCreateForm(request.POST)
+
+        if form.is_valid():
+            item = self.model.objects.create(vendor=vendor)
+            item.slug = form.cleaned_data['slug']
+            item.image = form.cleaned_data['slug']
+
+            return HttpResponseRedirect(f'/vendor/item_update/{item.slug}/')
+        else:
+            messages.add_message(request, messages.ERROR, form.errors)
+
+        context = {
+            'form': form,
+            'page_role': 'item',
+        }
+        return render(request, self.template_name, context)
+
+
+class ItemUpdate(UpdateView):
+    model = Item
+    fields = ['title', 'category', 'tag', 'color', 'image', 'description', 'price', 'slug',]
+    template_name_suffix = '_update_form'
+
+
+class RegistrationView(View):
+    """ Форма регистрации нового пользоваетля - клиента"""
+    pass
+
+
+class CartView(View):
+    """ Представление для корзины с товарами """
+    pass
+
+
+class ProfileView(LoginRequiredMixin, UpdateView):
     login_url = "/login/"
-    model = Vendor
+    model = Customer
     context_object_name = 'profile'
     template_name = 'main/account_profile.html'
-    VendorFormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponseRedirect(self.login_url)
 
         user = request.user
+        if Customer.objects.filter(user=user).count():
+            FormSet = inlineformset_factory(User, Customer, fields=('birthday',))
+        if Vendor.objects.filter(user=user).count():
+            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
+
         form = UserForm(instance=user)
-        formset = self.VendorFormSet(instance=user)
+        formset = FormSet(instance=user)
 
         return render(
             request,
@@ -211,45 +196,39 @@ class VendorView(LoginRequiredMixin, UpdateView):
             return HttpResponseRedirect(self.login_url)
 
         user = User.objects.get(username=request.user.username)
+        if Customer.objects.filter(user=user).count():
+            FormSet = inlineformset_factory(User, Customer, fields=('birthday',))
+            profile = Customer.objects.get(user=user)
+            fields = ['birthday']
+        elif Vendor.objects.filter(user=user).count():
+            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
+            profile = Vendor.objects.get(user=user)
+            fields = ['name', 'address', 'phone']
+        else:
+            return HttpResponseRedirect('/login/')
+
         form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
-        formset = self.VendorFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
+        formset = FormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
 
         if form.is_valid():
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.username = form.cleaned_data['username']
-            user.email = form.cleaned_data['email']
+            for field in ['first_name', 'last_name', 'username', 'email']:
+                vars(user)[field] = form.cleaned_data[field]
             user.save()
         else:
             messages.add_message(request, messages.ERROR, form.errors['username'])
 
         if formset.is_valid():
-            vendor = Vendor.objects.get(user=user)
             if formset.cleaned_data[0]['DELETE']:
                 user.delete()
-                vendor.delete()
+                profile.delete()
             else:
-                vendor.name = formset.cleaned_data[0]['name']
-                vendor.address = formset.cleaned_data[0]['address']
-                vendor.phone = formset.cleaned_data[0]['phone']
-                vendor.save()
+                for field in fields:
+                    vars(profile)[field] = formset.cleaned_data[0][field]
+
+            profile.save()
 
         else:
             messages.add_message(request, messages.ERROR, formset.errors[0])
 
-        return HttpResponseRedirect('/vendor/profile/')
+        return HttpResponseRedirect('/profile/')
 
-
-class ItemCreate(CreateView):
-    model = Item
-    fields = ['title', 'category', 'tag', 'color', 'image', 'description', 'price', 'slug',]
-
-
-class RegistrationView(View):
-    """ Форма регистрации нового пользоваетля - клиента"""
-    pass
-
-
-class CartView(View):
-    """ Представление для корзины с товарами """
-    pass

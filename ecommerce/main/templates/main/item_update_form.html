@@ -1,12 +1,12 @@
 {% extends "main/base.html" %}
 
-{% block title %}Новый товар{% endblock %}
+{% block title %}{{ object.title }}{% endblock %}
 
 
 {% block content %}
 <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Добавить товар">
+    <input type="submit" value="Сохранить товар">
 </form>
 
 {% endblock content %}

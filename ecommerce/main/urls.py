@@ -10,12 +10,11 @@ urlpatterns = [
     path('item/<str:slug>/', views.ItemView.as_view(), name='item'),
     path('items/', views.ItemListView.as_view(), name='items'),
     path('category/<str:slug>/', views.CategoryItemsView.as_view(), name='category'),
-    path('account/profile/', views.CustomerView.as_view(), name='profile'),
-    path('account/login/', views.LoginView.as_view(), name='login'),
-    path('account/logout/', LogoutView.as_view(next_page="/account/profile/"), name='logout'),
-    path('account/registration/', views.RegistrationView.as_view(), name='registration'),
-    path('vendor/profile/', views.VendorView.as_view(), name='vendor'),
-    path('vendor/item/', views.ItemCreate.as_view(), name='item_create'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page="/profile/"), name='logout'),
+    path('vendor/item_create/', views.ItemCreate.as_view(), name='item_create'),
+    path('vendor/item_update/<str:slug>/', views.ItemUpdate.as_view(), name='item_update'),
     path('cart/', views.CartView.as_view(), name='cart'),
 ]
 
