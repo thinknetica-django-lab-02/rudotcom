@@ -4,11 +4,12 @@ from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView, View, DetailView, UpdateView
+from django.views.generic import ListView, View, DetailView
 
 from .forms import UserForm, LoginForm
 from .models import Category, Item, Article, Customer, Vendor
 from django.contrib.auth import get_user_model, login, authenticate
+from django.views.generic.edit import CreateView, UpdateView
 
 User = get_user_model()
 
@@ -237,6 +238,11 @@ class VendorView(LoginRequiredMixin, UpdateView):
             messages.add_message(request, messages.ERROR, formset.errors[0])
 
         return HttpResponseRedirect('/vendor/profile/')
+
+
+class ItemCreate(CreateView):
+    model = Item
+    fields = ['title', 'category', 'tag', 'color', 'image', 'description', 'price', 'slug',]
 
 
 class RegistrationView(View):
