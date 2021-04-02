@@ -23,7 +23,7 @@ class Vendor(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64, unique=True, verbose_name='Наименование')
     phone = models.CharField(max_length=20, verbose_name='Телефон', blank=True)
     address = models.CharField(max_length=1024, verbose_name='Адрес', blank=True)
     started_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлен')
@@ -124,6 +124,7 @@ class Delivery(models.Model):
 
 
 class Article(models.Model):
+
     class Meta:
         verbose_name = 'Страница'
         verbose_name_plural = 'Страницы'
@@ -142,6 +143,11 @@ class Article(models.Model):
 
 
 class Customer(models.Model):
+
+    class Meta:
+        verbose_name = 'Покупатель'
+        verbose_name_plural = 'Покупатели'
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,

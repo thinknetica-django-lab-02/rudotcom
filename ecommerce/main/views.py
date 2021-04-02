@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView, UpdateView
 
 from .forms import UserForm, LoginForm
-from .models import Category, Item, Article, Customer
+from .models import Category, Item, Article, Customer, Vendor
 from django.contrib.auth import get_user_model, login, authenticate
 
 User = get_user_model()
@@ -40,6 +40,13 @@ class CategoryItemsView(ListView):
     model = Item
     template_name = 'main/category.html'
     paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs['slug']
+        category = Category.objects.get(slug=slug)
+        context['category'] = category
+        return context
 
     def get_queryset(self, **kwargs):
         slug = self.kwargs['slug']
@@ -137,7 +144,7 @@ class CustomerView(LoginRequiredMixin, UpdateView):
 
 
 class LoginView(View):
-    template_name = 'main/account_login.html'
+    template_name = 'main/login.html'
 
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST or None)
@@ -158,13 +165,78 @@ class LoginView(View):
             )
             if user:
                 login(request, user)
-                return HttpResponseRedirect('/account/profile/')
+                print('CUST', )
+                if Customer.objects.filter(user=user).count():
+                    return HttpResponseRedirect('/account/profile/')
+                if Vendor.objects.filter(user=user).count():
+                    return HttpResponseRedirect('/vendor/profile/')
+            else:
+                return HttpResponseRedirect('/login/')
 
         context = {
             'form': form,
             'page_role': 'login',
         }
         return render(request, self.template_name, context)
+
+
+class VendorView(LoginRequiredMixin, UpdateView):
+    login_url = "/login/"
+    model = Vendor
+    context_object_name = 'profile'
+    template_name = 'main/account_profile.html'
+    VendorFormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address',))
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(self.login_url)
+
+        user = request.user
+        form = UserForm(instance=user)
+        formset = self.VendorFormSet(instance=user)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                'form': form,
+                'formset': formset,
+                'page_role': 'profile',
+            }
+        )
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(self.login_url)
+
+        user = User.objects.get(username=request.user.username)
+        form = UserForm(request.POST, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
+        formset = self.VendorFormSet(request.POST, instance=user)  # Иначе formset не привяжется к экземпляру
+
+        if form.is_valid():
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.username = form.cleaned_data['username']
+            user.email = form.cleaned_data['email']
+            user.save()
+        else:
+            messages.add_message(request, messages.ERROR, form.errors['username'])
+
+        if formset.is_valid():
+            vendor = Vendor.objects.get(user=user)
+            if formset.cleaned_data[0]['DELETE']:
+                user.delete()
+                vendor.delete()
+            else:
+                vendor.name = formset.cleaned_data[0]['name']
+                vendor.address = formset.cleaned_data[0]['address']
+                vendor.phone = formset.cleaned_data[0]['phone']
+                vendor.save()
+
+        else:
+            messages.add_message(request, messages.ERROR, formset.errors[0])
+
+        return HttpResponseRedirect('/vendor/profile/')
 
 
 class RegistrationView(View):

@@ -14,7 +14,7 @@ class UserForm(forms.ModelForm):
         fields = ('last_name', 'first_name', 'email', 'username', )
         labels = {
             'email': 'Адрес email',
-            'username': 'Ник',
+            'username': 'Никнейм',
         }
 
 
