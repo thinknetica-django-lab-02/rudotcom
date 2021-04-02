@@ -18,12 +18,12 @@ class BaseView(View):
     def get(self, request):
         context = {
         }
-        return render(request, 'base.html', context=context)
+        return render(request, 'main/base.html', context=context)
 
 
 class ItemView(View):
     context_object_name = 'item'
-    template_name = 'item_detail.html'
+    template_name = 'main/item_detail.html'
 
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
@@ -51,7 +51,7 @@ class CategoryItemsView(ListView):
 
 class ItemListView(ListView):
     model = Item
-    template_name = 'item_list.html'
+    template_name = 'main/item_list.html'
     paginate_by = 2
 
     def get_context_data(self, **kwargs):
@@ -70,7 +70,7 @@ class ItemListView(ListView):
 class ArticleView(DetailView):
     model = Article
     context_object_name = 'article'
-    template_name = 'article_detail.html'
+    template_name = 'main/article_detail.html'
     slug_url_kwarg = 'slug'
 
     def get_context_data(self, **kwargs):
