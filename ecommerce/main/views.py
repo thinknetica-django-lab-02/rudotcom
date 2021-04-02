@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView
 
-from .forms import UserForm, LoginForm, ItemCreateForm
+from .forms import UserForm, LoginForm, ItemUpdateForm
 from .models import Category, Item, Article, Customer, Vendor
 from django.contrib.auth import get_user_model, login, authenticate
 from django.views.generic.edit import CreateView, UpdateView
@@ -30,9 +30,14 @@ class ItemView(View):
         slug = kwargs.get('slug')
         item = Item.objects.get(slug=slug)
         category = item.category
+
+        # Является ли user владельцем товара (для ссылки на редактирование)
+        is_owned = item.vendor.user == request.user
+
         context = {
             'category': category,
             'item': item,
+            'is_owned': is_owned,
         }
         return render(request, self.template_name, context=context)
 
@@ -121,21 +126,20 @@ class LoginView(View):
 
 
 class ItemCreate(CreateView):
+    form_class = ItemUpdateForm
     template_name = 'main/item_form.html'
-    model = Item
-    fields = ['title', 'category', 'color', 'image', 'description', 'price', 'tag', 'slug',]
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
         vendor = Vendor.objects.get(user=user)
-        form = ItemCreateForm(request.POST)
+        item = Item(vendor=vendor)
+        form = ItemUpdateForm(request.POST, request.FILES, instance=item)
 
         if form.is_valid():
-            item = self.model.objects.create(vendor=vendor)
-            for field in self.fields:
-                vars(item)[field] = form.cleaned_data[field]
+            item = form.save(commit=False)
+            item.save()
 
-            return HttpResponseRedirect(f'/vendor/item_update/{item.slug}/')
+            return HttpResponseRedirect(f'/item/{item.slug}/update/')
         else:
             messages.add_message(request, messages.ERROR, form.errors)
 
@@ -148,11 +152,11 @@ class ItemCreate(CreateView):
 
 class ItemUpdate(UpdateView):
     model = Item
-    fields = ['title', 'category', 'tag', 'color', 'image', 'description', 'price', 'slug',]
+    form_class = ItemUpdateForm
     template_name_suffix = '_update_form'
 
 
-class RegistrationView(View):
+class SignUpView(View):
     """ Форма регистрации нового пользоваетля - клиента"""
     pass
 
@@ -231,4 +235,3 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             messages.add_message(request, messages.ERROR, formset.errors[0])
 
         return HttpResponseRedirect('/profile/')
-

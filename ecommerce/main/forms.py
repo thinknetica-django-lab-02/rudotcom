@@ -5,13 +5,21 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class ItemCreateForm(forms.ModelForm):
+class ItemUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Item
-        fields = ['title', 'category', 'color', 'image', 'description', 'price', 'tag', 'slug', ]
-        labels = {
-            'title': 'Новый товар',
+        fields = ['title', 'category', 'color', 'image', 'description', 'price', 'price_discount', 'tag', 'slug', ]
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'input-image-control'}),
+            'title': forms.TextInput({'class': 'form-control'}),
+            'category': forms.Select({'class': 'form-control'}),
+            'color': forms.TextInput({'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'cols': 40, 'rows': 6}),
+            'price': forms.TextInput({'class': 'form-control'}),
+            'price_discount': forms.TextInput({'class': 'form-control'}),
+            'tag': forms.SelectMultiple({'class': 'form-control'}),
+            'slug': forms.TextInput({'class': 'form-control'}),
         }
 
 

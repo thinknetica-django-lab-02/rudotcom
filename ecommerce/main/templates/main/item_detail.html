@@ -11,7 +11,10 @@
       {% for tag in item.tag.all %}
       <a href="/items/?tag={{ tag }}">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}</div>
-  <p><strong>Продавец:</strong> <a href="/vendor/{{ item.vendor.slug }}/">{{ item.vendor }}</a></p> <!-- author detail link not yet defined -->
+  <p><strong>Продавец:</strong> <a href="/vendor/{{ item.vendor.slug }}/">{{ item.vendor }}</a>
+        {% if is_owned %}<a href="update/"> - редактировать товар</a>{% endif %}
+  </p>
+
   <p><strong>Цвет:</strong> {{ item.color }}</p>
   <p><strong>Цена:</strong> {{ item.price }}</p>
   <p><strong>Цена:</strong> {{ item.price_discount }}</p>

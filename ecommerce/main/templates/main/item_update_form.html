@@ -1,12 +1,12 @@
 {% extends "main/base.html" %}
 
-{% block title %}{{ object.title }}{% endblock %}
-
+{% block title %}Редактирование товара{% endblock %}
 
 {% block content %}
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Сохранить товар">
-</form>
-
+<div style="width:500px;">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Сохранить товар">
+    </form>
+</div>
 {% endblock content %}
