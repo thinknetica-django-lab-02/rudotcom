@@ -132,8 +132,8 @@ class ItemCreate(CreateView):
 
         if form.is_valid():
             item = self.model.objects.create(vendor=vendor)
-            item.slug = form.cleaned_data['slug']
-            item.image = form.cleaned_data['slug']
+            for field in self.fields:
+                vars(item)[field] = form.cleaned_data[field]
 
             return HttpResponseRedirect(f'/vendor/item_update/{item.slug}/')
         else:
