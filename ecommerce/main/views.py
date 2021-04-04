@@ -186,11 +186,13 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                                                 'birthday': forms.TextInput(attrs={'type': 'date'})
                                             })
             profile = Customer.objects.get(user=user)
+            new_item_link = False
 
         elif Vendor.objects.filter(user=user).count():
             FormSet = inlineformset_factory(User, Vendor,
                                             fields=('name', 'phone', 'address', 'image',))
             profile = Vendor.objects.get(user=user)
+            new_item_link = True
 
         return render(
             request,
@@ -200,6 +202,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                 'form': UserForm(instance=user),
                 'formset': FormSet(instance=user),
                 'page_role': 'profile',
+                'new_item_link': new_item_link,
             }
         )
 

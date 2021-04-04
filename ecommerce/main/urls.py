@@ -8,9 +8,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', views.BaseView.as_view(), name='base'),
     path('about/<str:slug>/', views.ArticleView.as_view(), name='article'),
+    path('item/new/', views.ItemCreate.as_view(), name='item_new'),
     path('item/<str:slug>/', views.ItemView.as_view(), name='item'),
     path('item/<str:slug>/update/', views.ItemUpdate.as_view(), name='item_update'),
-    path('item/new/', views.ItemCreate.as_view(), name='item_create'),
     path('items/', views.ItemListView.as_view(), name='items'),
     path('category/<str:slug>/', views.CategoryItemsView.as_view(), name='category'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
