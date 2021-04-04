@@ -1,8 +1,14 @@
 {% extends "main/base.html" %}
+{% load main_extras %}
 
-{% block title %} Категории {% endblock %}}
+{% block title %} {{ category.name }}: {% endblock %}}
 
-{% block header %}  {{ category }} {% endblock %}}
+{% block header %}  {{ category.name }} {% endblock %}}
+
+{% block breadcrumbs %}
+    {% catalog_breadcrumb category %}
+    <li class="breadcrumb-item active">{{ category.name }}</li>
+{% endblock %}
 
 {% block content %}
 
@@ -11,26 +17,24 @@
         <li><a href="{% url 'item' item.slug %}">{{ item.title }}</a></li>
 {% endfor %}
     </ul>
-<div class="pagination">
-    <span class="step-links">
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; 1</a>
+            <li class="page-item"><a href="?page=1">&laquo; 1</a>
             {% if page_obj.next_page_number != 1 %}
-            <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            <li class="page-item"><a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
             {% endif %}
         {% endif %}
 
-        <span class="current">
-            страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-        </span>
+            <li class="page-item">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            <li class="page-item"><a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
             {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
-            <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }} &raquo;</a>
+            <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }} &raquo;</a>
             {% endif %}
         {% endif %}
-    </span>
-</div>
+    </ul>
+</nav>
 
 {% endblock %}}

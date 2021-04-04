@@ -1,0 +1,5 @@
+
+    {% for parent in category.get_ancestors %}
+    <li class="breadcrumb-item"><a href="/category/{{ parent.slug }}/">{{ parent.name }}</a></li>
+    {% endfor %}
+

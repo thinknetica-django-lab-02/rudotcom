@@ -69,7 +69,6 @@ class Vendor(models.Model):
         img.save(os.path.join(settings.MEDIA_ROOT, image.name))
 
 
-
 class Category(MPTTModel):
 
     name = models.CharField(max_length=64, unique=False)
@@ -88,7 +87,7 @@ class Category(MPTTModel):
         order_insertion_by = ['name']
 
     def __str__(self):
-        return f"{self.parent_name} > {self.name}"
+        return self.name
 
 
 class Tag(models.Model):
@@ -216,3 +215,18 @@ class Customer(models.Model):
 
         img.thumbnail((200, 200))
         img.save(os.path.join(settings.MEDIA_ROOT, image.name))
+
+
+class Parameter(models.Model):
+
+    class Meta:
+        verbose_name = 'Параметр'
+        verbose_name_plural = 'Параметры'
+        ordering = ('name',)
+
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    value = models.CharField(max_length=50, verbose_name='Значение', blank=True)
+    meaning = models.TextField(verbose_name='Описание', null=True, blank=True)
+
+    def __str__(self):
+        return self.name

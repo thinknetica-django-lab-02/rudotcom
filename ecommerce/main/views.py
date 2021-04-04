@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.forms import inlineformset_factory
+from django import forms
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView
@@ -70,7 +71,7 @@ class ItemListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tag = self.request.GET.get('tag')
-        context['tag'] = tag
+        context['active_tag'] = tag
         return context
 
     def get_queryset(self):
@@ -177,24 +178,27 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             return HttpResponseRedirect(self.login_url)
 
         user = request.user
+        # Создаем доп поля формы для Customer
         if Customer.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Customer, fields=('birthday', 'image', ))
+            FormSet = inlineformset_factory(User, Customer,
+                                            fields=('birthday', 'image',),
+                                            widgets={
+                                                'birthday': forms.TextInput(attrs={'type': 'date'})
+                                            })
             profile = Customer.objects.get(user=user)
 
-        if Vendor.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address', 'image', ))
+        elif Vendor.objects.filter(user=user).count():
+            FormSet = inlineformset_factory(User, Vendor,
+                                            fields=('name', 'phone', 'address', 'image',))
             profile = Vendor.objects.get(user=user)
-
-        form = UserForm(instance=user)
-        formset = FormSet(instance=user)
 
         return render(
             request,
             self.template_name,
             {
                 'avatar': profile.image,
-                'form': form,
-                'formset': formset,
+                'form': UserForm(instance=user),
+                'formset': FormSet(instance=user),
                 'page_role': 'profile',
             }
         )
@@ -205,17 +209,18 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         user = User.objects.get(username=request.user.username)
         if Customer.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Customer, fields=('birthday', 'image', ))
+            FormSet = inlineformset_factory(User, Customer, fields=('birthday', 'image',))
             profile = Customer.objects.get(user=user)
             fields = ['birthday', 'image']
         elif Vendor.objects.filter(user=user).count():
-            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address', 'image', ))
+            FormSet = inlineformset_factory(User, Vendor, fields=('name', 'phone', 'address', 'image',))
             profile = Vendor.objects.get(user=user)
             fields = ['name', 'address', 'phone', 'image']
         else:
             return HttpResponseRedirect('/login/')
 
-        form = UserForm(request.POST, request.FILES, instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
+        form = UserForm(request.POST, request.FILES,
+                        instance=user)  # Иначе это будет новый экземпляр с попыткой создать нового юзера
         formset = FormSet(request.POST, request.FILES, instance=user)  # Иначе formset не привяжется к экземпляру
 
         if form.is_valid():

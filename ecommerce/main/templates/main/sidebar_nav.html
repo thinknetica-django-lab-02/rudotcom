@@ -1,8 +1,8 @@
 {% load main_extras %}
-{% category_list as categories %}
 
+{% category_list as categories %}
 {% load mptt_tags %}
-      <div class="col-sm-2">
+   <div class="category_menu">
       <ul class="sidebar-nav">
     {% recursetree categories %}
         <li>
@@ -19,11 +19,23 @@
         </li>
     {% endrecursetree %}
       </ul>
-      <hr>
 {% article_list as articles %}
       <ul class="article-menu">
           {% for item in articles %}
         <li><a href="{{ item.get_absolute_url }}">{{ item.name }}</a></li>
           {% endfor %}
       </ul>
+
+      {% active_tag_list as tags %}
+       Теги:
+      <div class="tags">
+      {% for tag in tags %}
+      {% if tag.string == active_tag %}
+        {{ tag.string }}
+      {% else %}
+        <a href="/items/?tag={{ tag.string }}">{{ tag.string }}</a>
+      {% endif %}
+      {% endfor %}
       </div>
+
+   </div>

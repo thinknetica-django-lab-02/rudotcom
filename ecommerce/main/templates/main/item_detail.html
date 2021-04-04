@@ -1,16 +1,23 @@
 {% extends "main/base.html" %}
+{% load main_extras %}
 
-{% block title %} Категории {% endblock %}}
+{% block title %} {{ item.title }} {% endblock %}}
 
-{% block header %}  {{ category }} {% endblock %}}
+{% block header %}  {{ item.title }} {% endblock %}}
+
+{% block breadcrumbs %}
+    {% catalog_breadcrumb category %}
+    <li class="breadcrumb-item active"><a href="/category/{{ category.slug }}/">{{ category.name }}</a></li>
+    <li class="breadcrumb-item active">{{ item.title }}</a></li>
+{% endblock %}
 
 {% block content %}
-  <h1>Title: {{ item.title }}</h1>
 
   <div style="display: block; float: right;"><strong>Теги:</strong>
       {% for tag in item.tag.all %}
       <a href="/items/?tag={{ tag }}">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}</div>
+  <p> <img src="/media/{{ item.image }}" width=200></p>
   <p><strong>Продавец:</strong> <a href="/vendor/{{ item.vendor.slug }}/">{{ item.vendor }}</a>
         {% if is_owned %}<a href="update/"> - редактировать товар</a>{% endif %}
   </p>
@@ -18,7 +25,6 @@
   <p><strong>Цвет:</strong> {{ item.color }}</p>
   <p><strong>Цена:</strong> {{ item.price }}</p>
   <p><strong>Цена:</strong> {{ item.price_discount }}</p>
-  <p><strong>Изображение:</strong> <img src="/media/{{ item.image }}" width=200></p>
 
 
 {% endblock %}}

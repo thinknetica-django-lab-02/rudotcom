@@ -2,7 +2,11 @@
 
 {% block title %} Теги {% endblock %}}
 
-{% block header %}  Товары с тегом "{{ tag }}" {% endblock %}}
+{% block header %}  Товары с тегом "{{ active_tag }}" {% endblock %}}
+
+{% block breadcrumbs %}
+                <li class="breadcrumb-item active">Теги: {{ active_tag }}</li>
+{% endblock %}
 
 {% block content %}
 
@@ -14,9 +18,9 @@
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
-            <a href="?tag={{ tag }}&page=1">&laquo; 1</a>
+            <a href="?tag={{ active_tag }}&page=1">&laquo; 1</a>
             {% if page_obj.next_page_number != 1 %}
-            <a href="/items/?tag={{ tag }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            <a href="/items/?tag={{ active_tag }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
             {% endif %}
         {% endif %}
 
@@ -25,9 +29,9 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="/items/?tag={{ tag }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            <a href="/items/?tag={{ active_tag }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
             {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
-            <a href="/items/?tag={{ tag }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }} &raquo;</a>
+            <a href="/items/?tag={{ active_tag }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }} &raquo;</a>
             {% endif %}
         {% endif %}
     </span>

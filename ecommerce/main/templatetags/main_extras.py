@@ -1,6 +1,6 @@
 import datetime
 from django import template
-from ..models import Category, Article
+from ..models import Category, Article, Tag
 
 register = template.Library()
 
@@ -28,3 +28,16 @@ def current_category(slug):
 @register.simple_tag
 def article_list():
     return Article.objects.all()
+
+
+@register.simple_tag
+def active_tag_list():
+    # return Tag.objects.filter(item__isnull=False).distinct()
+    return Tag.objects.all().exclude(item__isnull=True)
+
+
+@register.inclusion_tag('main/breadcrumbs.html')
+def catalog_breadcrumb(category):
+    return {
+        'category': category
+    }

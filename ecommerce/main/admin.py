@@ -1,16 +1,18 @@
 from django import forms
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
 from django.contrib.auth.models import Group
 from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Category, Tag, Vendor, Item, Article, Customer
+from .models import Category, Tag, Vendor, Item, Article, Customer, Parameter
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class CustomMPTTModelAdmin(MPTTModelAdmin):
+    # specify pixel amount for this ModelAdmin only:
+    mptt_level_indent = 40
     fields = ['name', 'parent', 'slug']
-    list_display = ('name', 'parent', 'slug')
-    ordering = ['parent', 'name', ]
+    list_display = ('name', 'slug')
     list_filter = ['parent']
     prepopulated_fields = {"slug": ("name",)}
 
@@ -59,11 +61,24 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ('name', 'title', 'slug',)
 
 
+class ParameterAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('name', 'value', 'meaning',)}),
+    )
+    readonly_fields = ['name', ]
+    list_display = ('name', 'value',)
+
+    # убрать кнопку "Удалить"
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.site_header = "Маркетплейс. Панель управления"
 admin.site.unregister(Group)
 admin.site.register(Customer)
 admin.site.register(Vendor)
 admin.site.register(Tag)
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(Category, CustomMPTTModelAdmin)
+admin.site.register(Parameter, ParameterAdmin)
