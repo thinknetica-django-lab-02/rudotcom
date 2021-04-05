@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django import forms
@@ -94,8 +95,9 @@ class ArticleView(DetailView):
         return context
 
 
-class LoginView(View):
+class LoginView(LoginView):
     template_name = 'main/login.html'
+    next_page = None
 
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST or None)
@@ -108,6 +110,8 @@ class LoginView(View):
     def post(self, request, *args, **kwargs):
 
         form = LoginForm(request.POST)
+        next_page = request.GET['next']
+
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -116,7 +120,9 @@ class LoginView(View):
             )
             if user:
                 login(request, user)
-                return HttpResponseRedirect('/profile/')
+                if not next_page:
+                    next_page = '/profile/'
+                return HttpResponseRedirect(next_page)
             else:
                 return HttpResponseRedirect('/login/')
 
@@ -127,7 +133,8 @@ class LoginView(View):
         return render(request, self.template_name, context)
 
 
-class ItemCreate(CreateView):
+class ItemCreate(LoginRequiredMixin, CreateView):
+    login_url = "/login/"
     form_class = ItemUpdateForm
     template_name = 'main/item_form.html'
 
@@ -152,7 +159,8 @@ class ItemCreate(CreateView):
         return render(request, self.template_name, context)
 
 
-class ItemUpdate(UpdateView):
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    login_url = "/login/"
     model = Item
     form_class = ItemUpdateForm
     template_name_suffix = '_update_form'
@@ -178,7 +186,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     login_url = "/login/"
     model = Customer
     context_object_name = 'profile'
-    template_name = 'main/account_profile.html'
+    template_name = 'main/profile.html'
 
     def get(self, request, *args, **kwargs):
 
