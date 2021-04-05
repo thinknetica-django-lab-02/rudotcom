@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from . import views
 from django.conf import settings
@@ -18,6 +18,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page="/login/"), name='logout'),
     path('sign-up/', views.SignUpView.as_view(), name='sign-up'),
     path('cart/', views.CartView.as_view(), name='cart'),
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

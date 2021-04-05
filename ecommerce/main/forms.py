@@ -1,4 +1,6 @@
 from django import forms
+from django.db import transaction
+
 from .models import Customer, Item
 from django.contrib.auth import get_user_model
 
@@ -6,7 +8,6 @@ User = get_user_model()
 
 
 class ItemUpdateForm(forms.ModelForm):
-
     class Meta:
         model = Item
         fields = ['title', 'category', 'color', 'image', 'description', 'price', 'price_discount', 'tag', 'slug', ]
@@ -29,7 +30,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
 
-        fields = ('last_name', 'first_name', 'email', 'username', )
+        fields = ('last_name', 'first_name', 'email', 'username',)
         labels = {
             'email': 'Адрес email',
             'username': 'Никнейм',
@@ -59,3 +60,17 @@ class LoginForm(forms.ModelForm):
                 raise forms.ValidationError("Неверные учетные данные")
         return self.cleaned_data
 
+
+# ACCOUNT_SIGNUP_FORM_CLASS = 'main.forms.CustomSignupForm' ==== не работает
+class CustomSignupForm(forms.Form):
+    first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Имя'}))
+    last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}))
+
+    def signup(self, request, user):
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.save()
+
+    @transaction.atomic
+    def save(self, request, user):
+        user.save()  # save the user object first so you can use it for relationships

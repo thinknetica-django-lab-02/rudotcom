@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
@@ -97,7 +96,6 @@ class ArticleView(DetailView):
 
 class LoginView(LoginView):
     template_name = 'main/login.html'
-    next_page = None
 
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST or None)
@@ -110,7 +108,7 @@ class LoginView(LoginView):
     def post(self, request, *args, **kwargs):
 
         form = LoginForm(request.POST)
-        next_page = request.GET['next']
+        next_page = request.GET.get('next') or '/profile/'
 
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -120,8 +118,6 @@ class LoginView(LoginView):
             )
             if user:
                 login(request, user)
-                if not next_page:
-                    next_page = '/profile/'
                 return HttpResponseRedirect(next_page)
             else:
                 return HttpResponseRedirect('/login/')
@@ -191,6 +187,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
 
         user = request.user
+        profile = None
         # Создаем доп поля формы для Customer
         is_vendor = False
         if Customer.objects.filter(user=user).count():

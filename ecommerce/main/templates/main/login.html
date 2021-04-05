@@ -2,10 +2,23 @@
 
 {% block content %}
     <h3 class="text-center">Авторизация</h3>
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+
 <div class="control-form">
+{% for provider in socialaccount_providers %}
+    {% if provider.id == "openid" %}
+        {% for brand in provider.get_brands %}
+          <a title="{{brand.name}}" class="{{provider.id}} {{brand.id}}" href="{% provider_login_url provider.id openid=brand.openid_url process=process %}">{{brand.name}}</a>
+        {% endfor %}
+    {% endif %}
+    <a title="{{provider.name}}" class="{{provider.id}}" href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{{provider.name}}</a>
+{% endfor %}
+    <p>Или:</p>
     <form action="" method="POST">
         {% csrf_token %}
         <table>{{ form }}</table>
+        <input type="hidden" name="next" value="{{ next }}">
         <input type="submit" class="btn btn-success btn-block" value="Войти">
     </form>
       <br>Нет аккаунта? <a href="{% url 'sign-up' %}">Зарегистрироваться</a></p>

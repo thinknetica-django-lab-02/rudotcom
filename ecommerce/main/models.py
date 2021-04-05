@@ -6,11 +6,10 @@ from django.db import models
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.conf import settings
 from PIL import Image
 
-User = get_user_model()
 PRODUCT_BIG = (1100, 3000)
 PRODUCT_CARD = (300, 400)
 PRODUCT_THUMB = (50, 50)
@@ -202,6 +201,8 @@ class Customer(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
+    first_name = models.CharField(max_length=30, verbose_name='Имя')
+    last_name = models.CharField(max_length=30, verbose_name='Фамилия')
     image = models.ImageField(null=True, upload_to=upload_avatar)
     birthday = models.DateField(verbose_name='Дата рождения', validators=[is_adult])
 
