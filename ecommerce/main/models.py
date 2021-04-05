@@ -122,10 +122,10 @@ class Item(models.Model):
     visits = models.IntegerField(default=0, verbose_name='👁', help_text='Количество просмотров')
     last_visit = models.DateTimeField(blank=True, null=True, verbose_name='Просмотрен')
 
-    def image_tag(self):
+    def image_thumb(self):
         return mark_safe('<img src="/media/thumb/%s" height="50" />' % self.image)
 
-    image_tag.short_description = 'Изображение'
+    image_thumb.short_description = 'Изображение'
 
     class Meta:
         verbose_name = 'Товар'

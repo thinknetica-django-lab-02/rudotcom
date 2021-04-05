@@ -30,7 +30,7 @@ class ItemAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Товар',
          {'fields': ['title', 'category', 'price', 'price_discount', 'quantity', 'vendor',
-                     ('image', 'image_tag',), 'description', 'tag', 'display', 'color',
+                     ('image', 'image_thumb',), 'description', 'tag', 'display', 'color',
                      ]
           }
          ),
@@ -40,8 +40,8 @@ class ItemAdmin(admin.ModelAdmin):
           }
          ),
     ]
-    readonly_fields = ['image_tag', 'visits', 'last_visit', 'date_added', ]
-    list_display = ('title', 'image_tag', 'visits', 'category', 'price', 'price_discount', 'quantity', 'display')
+    readonly_fields = ['image_thumb', 'visits', 'last_visit', 'date_added', ]
+    list_display = ('title', 'image_thumb', 'visits', 'category', 'price', 'price_discount', 'quantity', 'display')
     list_filter = ['display', ]
     search_fields = ['title', 'description']
     ordering = ('-date_added', 'title', 'category', 'price', 'quantity')

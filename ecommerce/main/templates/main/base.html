@@ -34,11 +34,18 @@
                 <li><a href="{% url 'login' %}"{% if page_role == 'login' %} class="active"{% endif %}>Войти</a></li>
                 <li><a href="{% url 'sign-up' %}"{% if page_role == 'profile' %} class="active"{% endif %}>Регистрация</a></li>
             {% else %}
-                <li><a href="{% url 'profile' %}"{% if page_role == 'profile' %} class="active"{% endif %}>Личный Кабинет {{ request.user }}</a><a href="{% url 'logout' %}" title="Выйти"><i class="fa fa-sign-out"></i></a></li>
+                <li><a href="{% url 'profile' %}"{% if page_role == 'profile' %} class="active"{% endif %}>Кабинет </a><a href="{% url 'logout' %}" title="Выйти"><i class="fa fa-sign-out"></i></a></li>
             {% endif %}
               </ul>
             </nav>
           </div>
+{% if is_vendor %}
+        <ul class="tm-nav-pro">
+            <li>{{ request.user }}:</li>
+<!--            <li><a href="{% url 'profile' %}">Профиль</a></li>-->
+            <li><a href="{% url 'item_new' %}">Новый товар</a></li>
+        </ul>
+{% endif %}
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.forms import inlineformset_factory
@@ -140,7 +141,7 @@ class ItemCreate(CreateView):
             item = form.save(commit=False)
             item.save()
 
-            return HttpResponseRedirect(f'/item/{item.slug}/update/')
+            return HttpResponseRedirect(f'/item/{item.slug}/')
         else:
             messages.add_message(request, messages.ERROR, form.errors)
 
@@ -155,6 +156,12 @@ class ItemUpdate(UpdateView):
     model = Item
     form_class = ItemUpdateForm
     template_name_suffix = '_update_form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        item = Item.objects.get(slug=self.kwargs['slug'])
+        context['image_thumb'] = item.image_thumb
+        return context
 
 
 class SignUpView(View):
@@ -174,11 +181,10 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     template_name = 'main/account_profile.html'
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(self.login_url)
 
         user = request.user
         # Создаем доп поля формы для Customer
+        is_vendor = False
         if Customer.objects.filter(user=user).count():
             FormSet = inlineformset_factory(User, Customer,
                                             fields=('birthday', 'image',),
@@ -186,13 +192,12 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                                                 'birthday': forms.TextInput(attrs={'type': 'date'})
                                             })
             profile = Customer.objects.get(user=user)
-            new_item_link = False
 
         elif Vendor.objects.filter(user=user).count():
             FormSet = inlineformset_factory(User, Vendor,
                                             fields=('name', 'phone', 'address', 'image',))
             profile = Vendor.objects.get(user=user)
-            new_item_link = True
+            is_vendor = True
 
         return render(
             request,
@@ -202,13 +207,11 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                 'form': UserForm(instance=user),
                 'formset': FormSet(instance=user),
                 'page_role': 'profile',
-                'new_item_link': new_item_link,
+                'is_vendor': is_vendor,
             }
         )
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(self.login_url)
 
         user = User.objects.get(username=request.user.username)
         if Customer.objects.filter(user=user).count():
