@@ -3,6 +3,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
@@ -201,21 +203,14 @@ class Customer(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    first_name = models.CharField(max_length=30, verbose_name='Имя')
-    last_name = models.CharField(max_length=30, verbose_name='Фамилия')
-    image = models.ImageField(null=True, upload_to=upload_avatar)
-    birthday = models.DateField(verbose_name='Дата рождения', validators=[is_adult])
 
     def __str__(self):
         return self.user.username
 
-    def save(self, *args, **kwargs):
-        image = self.image
-        img = Image.open(image)
-        super().save(*args, **kwargs)
-
-        img.thumbnail((200, 200))
-        img.save(os.path.join(settings.MEDIA_ROOT, image.name))
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Customer.objects.create(user=instance)
 
 
 class Parameter(models.Model):
