@@ -6,13 +6,28 @@ from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from PIL import Image
 
 from .utils import path_and_rename, upload_avatar
 
 
+# class User(AbstractUser):
+#     CUSTOMER = 1
+#     VENDOR = 2
+#
+#     ROLE_CHOICES = (
+#         (CUSTOMER, 'Customer'),
+#         (VENDOR, 'Vendor'),
+#     )
+#     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
+
+
 class Vendor(models.Model):
+    """
+    Продавец - одна из ролей класса User
+    """
 
     user = models.OneToOneField(
         User,
@@ -135,7 +150,9 @@ class Item(models.Model):
 
 
 class Delivery(models.Model):
-    """ Условия доставки разных типов и условия бесплатной доставки """
+    """
+    Условия доставки разных типов и условия бесплатной доставки
+    """
 
     title = models.CharField(max_length=255, verbose_name='Тип доставки')
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Стоимость')
@@ -151,6 +168,9 @@ class Delivery(models.Model):
 
 
 class Article(models.Model):
+    """
+    Простые страницы типа "Контакты" или "Доставка"
+    """
 
     class Meta:
         verbose_name = 'Страница'
@@ -170,6 +190,9 @@ class Article(models.Model):
 
 
 class Customer(models.Model):
+    """
+    Модель Покупатель. При автризации через соцсети создается экземпляр этого класса
+    """
 
     class Meta:
         verbose_name = 'Покупатель'

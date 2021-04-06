@@ -74,7 +74,7 @@ class ParameterAdmin(admin.ModelAdmin):
 
 
 admin.site.site_header = "Маркетплейс. Панель управления"
-admin.site.unregister(Group)
+# admin.site.unregister(Group)
 admin.site.register(Customer)
 admin.site.register(Vendor)
 admin.site.register(Tag)
