@@ -3,6 +3,8 @@
 from django.db import migrations, models
 import main.models
 
+import ecommerce.main.utils
+
 
 class Migration(migrations.Migration):
 
@@ -19,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='item',
             name='image',
-            field=models.ImageField(upload_to=main.models.path_and_rename, verbose_name='Изображение'),
+            field=models.ImageField(upload_to=ecommerce.main.utils.path_and_rename, verbose_name='Изображение'),
         ),
     ]

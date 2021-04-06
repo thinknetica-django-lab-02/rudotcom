@@ -1,7 +1,4 @@
 import os
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -12,31 +9,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from PIL import Image
 
-PRODUCT_BIG = (1100, 3000)
-PRODUCT_CARD = (300, 400)
-PRODUCT_THUMB = (50, 50)
-
-
-def is_adult(value):
-    adult_age = value + relativedelta(years=18)
-    if adult_age > datetime.now().date():  # if adult age is in future
-        raise ValidationError('Возраст должен быть не менее 18 лет')
-
-
-def path_and_rename(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = f'{instance.category.slug}_{instance.slug}.{ext}'
-    os.remove(os.path.join(settings.MEDIA_ROOT, filename))
-    return f'{filename}'
-
-
-def upload_avatar(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = f'{instance.user.username}.{ext}'
-    file_path = os.path.join(settings.MEDIA_ROOT, filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return f'avatar/{filename}'
+from .utils import path_and_rename, upload_avatar
 
 
 class Vendor(models.Model):
@@ -105,6 +78,10 @@ class Tag(models.Model):
 
 class Item(models.Model):
 
+    PRODUCT_BIG = (1100, 3000)
+    PRODUCT_CARD = (300, 400)
+    PRODUCT_THUMB = (50, 50)
+
     category = models.ForeignKey(Category, verbose_name='Категория', null=False, default=1, on_delete=models.CASCADE)
     tag = models.ManyToManyField(Tag, verbose_name='Тэг', blank=True)
     vendor = models.ForeignKey(Vendor, verbose_name='Продавец', null=False, on_delete=models.CASCADE)
@@ -145,13 +122,13 @@ class Item(models.Model):
         ext = image.name.split('.')[-1]
         filename = f'{self.category.slug}_{self.slug}.{ext}'
 
-        img.thumbnail(PRODUCT_BIG, Image.ANTIALIAS)
+        img.thumbnail(self.PRODUCT_BIG, Image.ANTIALIAS)
         img.save(os.path.join(settings.MEDIA_ROOT, filename), 'JPEG', quality=95)
 
-        img.thumbnail(PRODUCT_CARD, Image.ANTIALIAS)
+        img.thumbnail(self.PRODUCT_CARD, Image.ANTIALIAS)
         img.save(os.path.join(settings.MEDIA_ROOT, 'card', filename), 'JPEG', quality=85)
 
-        img.thumbnail(PRODUCT_THUMB)
+        img.thumbnail(self.PRODUCT_THUMB)
         img.save(os.path.join(settings.MEDIA_ROOT, 'thumb', filename))
 
         super().save(*args, **kwargs)

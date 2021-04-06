@@ -193,7 +193,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         if Vendor.objects.filter(user=user).count():
             FormSet = inlineformset_factory(User, Vendor,
                                             fields=('name', 'phone', 'address', 'image',))
-            formset = FormSet(isinstance=user)
+            formset = FormSet()
             is_vendor = True
 
         return render(
@@ -233,6 +233,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         if formset:
             if formset.is_valid():
+                print(formset)
                 if formset.cleaned_data[0]['DELETE']:
                     user.delete()
                     profile.delete()
