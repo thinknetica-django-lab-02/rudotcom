@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+
+{% block title %}Регистарция{% endblock %}
+
+{% block content %}
+<h1>Регистрация</h1>
+<button class="btn btn-outline-danger" ><a href="{% provider_login_url 'google' %}">Регистрация через Google аккаунт</a></button>
+   <p>Или:</p>
+<table class="control-form">
+ <form method="post">
+    {% csrf_token %}
+    {{ form }}
+     <tr>
+         <th></th>
+         <td>
+             <div class="d-grid gap-2 col-6 mx-auto">
+             <input class="btn btn-primary" type="submit" value="Регистрация">
+            </div>
+        </td>
+     </tr>
+
+
+</form>
+</table>
+{% endblock %}

@@ -1,7 +1,10 @@
 import os
+
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
@@ -202,6 +205,15 @@ class Customer(models.Model):
             group, _ = Group.objects.get_or_create(name=DEFAULT_GROUP_NAME)
             instance.groups.add(Group.objects.get(name=DEFAULT_GROUP_NAME))
             Customer.objects.create(user=instance)
+
+            html = render_to_string('main/sign_up_email.html', {
+                'first_name': instance.first_name,
+                'last_name': instance.last_name
+            })
+            send_mail('Регистрация на сайте', 'Вы зарегистрированы в нашем Маркете!',
+                      'Маркетплейс<noreply@marketplace.io>', [instance.email],
+                      fail_silently=False, html_message=html
+                      )
 
 
 class Parameter(models.Model):

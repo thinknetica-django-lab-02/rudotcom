@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.forms import inlineformset_factory
-from django import forms
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView
@@ -170,9 +169,10 @@ class ItemUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         return context
 
 
-class SignUpView(View):
-    """ Форма регистрации нового пользоваетля - клиента"""
-    pass
+class SignUpView(CreateView):
+    model = Customer
+    form_class = UserForm
+    template_name = 'main/sign_up.html'
 
 
 class CartView(View):

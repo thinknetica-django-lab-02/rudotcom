@@ -62,7 +62,7 @@ class LoginForm(forms.ModelForm):
 
 
 # ACCOUNT_SIGNUP_FORM_CLASS = 'main.forms.CustomSignupForm' ==== не работает
-class CustomSignupForm(forms.Form):
+class CustomerSignupForm(forms.Form):
     first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Имя'}))
     last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}))
 
