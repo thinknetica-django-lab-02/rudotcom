@@ -184,3 +184,4 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+DEFAULT_GROUP_NAME = 'common users'

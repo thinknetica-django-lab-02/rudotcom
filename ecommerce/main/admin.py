@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
-from django.contrib.auth.models import Group
 from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 

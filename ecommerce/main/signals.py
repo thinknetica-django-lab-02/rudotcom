@@ -1,6 +1,6 @@
 import hashlib
 
-from allauth.account.signals import user_signed_up, user_logged_in
+from allauth.account.signals import user_signed_up
 from django.dispatch import receiver
 
 from ecommerce.main.models import Customer
