@@ -13,17 +13,6 @@ from PIL import Image
 from .utils import path_and_rename, upload_avatar
 
 
-# class User(AbstractUser):
-#     CUSTOMER = 1
-#     VENDOR = 2
-#
-#     ROLE_CHOICES = (
-#         (CUSTOMER, 'Customer'),
-#         (VENDOR, 'Vendor'),
-#     )
-#     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
-
-
 class Vendor(models.Model):
     """
     Продавец - одна из ролей класса User
