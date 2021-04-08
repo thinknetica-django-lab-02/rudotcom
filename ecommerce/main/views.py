@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.forms import inlineformset_factory
@@ -129,10 +129,11 @@ class LoginView(LoginView):
         return render(request, self.template_name, context)
 
 
-class ItemCreate(LoginRequiredMixin, CreateView):
+class ItemCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     login_url = "/login/"
     form_class = ItemUpdateForm
     template_name = 'main/item_form.html'
+    permission_required = ['main.add_item', 'main.view_item']
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
@@ -155,11 +156,12 @@ class ItemCreate(LoginRequiredMixin, CreateView):
         return render(request, self.template_name, context)
 
 
-class ItemUpdate(LoginRequiredMixin, UpdateView):
+class ItemUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     login_url = "/login/"
     model = Item
     form_class = ItemUpdateForm
     template_name_suffix = '_update_form'
+    permission_required = ('main.change_item', 'main.delete_item', 'main.view_item')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
