@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 ]
 
 SITE_ID = 1
@@ -149,7 +150,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400  # 1 day. This does ot prevent admin login frombeing brut forced.
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'  # or any other page
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'  # or any other page
 LOGIN_REDIRECT_URL = '/profile/'  # redirects to profile page by default
 ACCOUNT_PRESERVE_USERNAME_CASING = False  # reduces the delays in iexact lookups
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
@@ -170,6 +171,27 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'name',
+            'name_format',
+            'picture',
+            'short_name'
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': 'path.to.callable',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v7.0',
     }
 }
 DEFAULT_GROUP_NAME = 'common users'

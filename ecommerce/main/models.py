@@ -206,7 +206,7 @@ class Customer(models.Model):
             instance.groups.add(Group.objects.get(name=DEFAULT_GROUP_NAME))
             Customer.objects.create(user=instance)
 
-            html = render_to_string('main/sign_up_email.html', {
+            html = render_to_string('account/email/sign_up_email.html', {
                 'first_name': instance.first_name,
                 'last_name': instance.last_name
             })
