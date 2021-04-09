@@ -4,7 +4,7 @@ from mptt.admin import MPTTModelAdmin
 from django.forms import ModelForm
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Category, Tag, Vendor, Item, Article, Customer, Parameter
+from .models import Category, Tag, Vendor, Item, Article, Customer, Parameter, Subscriber
 
 
 class CustomMPTTModelAdmin(MPTTModelAdmin):
@@ -81,3 +81,4 @@ admin.site.register(Item, ItemAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CustomMPTTModelAdmin)
 admin.site.register(Parameter, ParameterAdmin)
+admin.site.register(Subscriber)

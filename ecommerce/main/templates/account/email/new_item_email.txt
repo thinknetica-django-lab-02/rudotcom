@@ -1,0 +1,6 @@
+{{ user.first_name }} {{ user.last_name }}
+
+Новый товар в маркетплейсе:
+{{ item.title }}
+{{ item.description }}
+См. на сайте: http://127.0.0.1:8000/item/{{ item.slug }}/

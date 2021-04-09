@@ -229,3 +229,29 @@ class Parameter(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subscriber(models.Model):
+
+    user = models.ManyToManyField(Customer)
+
+    @receiver(post_save, sender=Item)
+    def notify_subscribers(sender, instance, created, **kwargs):
+        if created:
+            subscription = Subscriber.objects.get(pk=1).user.all()
+
+            for subscriber in subscription:
+                context = {
+                    'item': instance,
+                    'user': subscriber.user
+                }
+                html = render_to_string('account/email/new_item_email.html', context=context)
+                text = render_to_string('account/email/new_item_email.txt', context=context)
+
+                to = '{} {}<{}>'.format(subscriber.user.first_name, subscriber.user.last_name, subscriber.user.email)
+
+                send_mail('Новый товар на маркете!', text,
+                          'Маркетплейс<noreply@marketplace.io>', [to],
+                          fail_silently=False, html_message=html
+                          )
+
