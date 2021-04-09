@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'main',
+    'main.apps.MainConfig',
     'mptt',
 
     'allauth',
@@ -195,4 +195,4 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 DEFAULT_GROUP_NAME = 'common users'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Вывод тела письма в консоль

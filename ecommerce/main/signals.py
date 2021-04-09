@@ -4,8 +4,10 @@ from allauth.account.signals import user_signed_up
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User, Group
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 
-from .models import Customer
+from .models import Customer, Item, Subscriber
 from ecommerce.settings import DEFAULT_GROUP_NAME
 
 
@@ -15,6 +17,37 @@ def create_user_profile(sender, instance, created, **kwargs):
         group, _ = Group.objects.get_or_create(name=DEFAULT_GROUP_NAME)
         instance.groups.add(Group.objects.get(name=DEFAULT_GROUP_NAME))
         Customer.objects.create(user=instance)
+
+        html = render_to_string('account/email/sign_up_email.html', {
+            'first_name': instance.first_name,
+            'last_name': instance.last_name
+        })
+        send_mail('Регистрация на сайте', 'Вы зарегистрированы в нашем Маркете!',
+                  'Маркетплейс<noreply@marketplace.io>', [instance.email],
+                  fail_silently=False, html_message=html
+                  )
+
+
+@receiver(post_save, sender=Item)
+def notify_subscribers(sender, instance, created, **kwargs):
+    if created:
+        subscription = Subscriber.objects.get(pk=1).user.all()
+
+        for subscriber in subscription:
+            context = {
+                'item': instance,
+                'user': subscriber.user
+            }
+            html = render_to_string('account/email/new_item_email.html', context=context)
+            text = render_to_string('account/email/new_item_email.txt', context=context)
+
+            to = '{} {}<{}>'.format(subscriber.user.first_name, subscriber.user.last_name, subscriber.user.email)
+
+            send_mail('Новый товар на маркете!', text,
+                      'Маркетплейс<noreply@marketplace.io>', [to],
+                      fail_silently=False, html_message=html
+                      )
+
 
 
 @receiver(user_signed_up)
