@@ -1,7 +1,5 @@
 import os
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
@@ -10,7 +8,6 @@ from django.conf import settings
 from PIL import Image
 
 from .utils import path_and_rename, upload_avatar
-from ecommerce.settings import DEFAULT_GROUP_NAME
 
 
 class Vendor(models.Model):
@@ -195,13 +192,6 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.user.username
-
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            group, _ = Group.objects.get_or_create(name=DEFAULT_GROUP_NAME)
-            instance.groups.add(Group.objects.get(name=DEFAULT_GROUP_NAME))
-            Customer.objects.create(user=instance)
 
 
 class Parameter(models.Model):

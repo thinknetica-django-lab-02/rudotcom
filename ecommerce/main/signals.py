@@ -1,13 +1,24 @@
 import hashlib
 
 from allauth.account.signals import user_signed_up
+from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User, Group
 
-from ecommerce.main.models import Customer
+from .models import Customer
+from ecommerce.settings import DEFAULT_GROUP_NAME
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        group, _ = Group.objects.get_or_create(name=DEFAULT_GROUP_NAME)
+        instance.groups.add(Group.objects.get(name=DEFAULT_GROUP_NAME))
+        Customer.objects.create(user=instance)
 
 
 @receiver(user_signed_up)
-def social_login_fname_lname_profilepic(sociallogin, user):
+def social_login_fname_lname_profilepic(sociallogin, user, **kwargs):
     preferred_avatar_size_pixels = 256
 
     picture_url = "http://www.gravatar.com/avatar/{0}?s={1}".format(

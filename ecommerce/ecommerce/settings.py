@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'main',
+    'main.apps.MainConfig',
     'mptt',
 
     'allauth',
