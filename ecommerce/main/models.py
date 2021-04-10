@@ -1,17 +1,15 @@
 import os
 
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.html import mark_safe
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.conf import settings
 from PIL import Image
 
 from .utils import path_and_rename, upload_avatar
-from ecommerce.settings import DEFAULT_GROUP_NAME
+
 
 
 class Vendor(models.Model):
