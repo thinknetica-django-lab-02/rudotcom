@@ -196,3 +196,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 DEFAULT_GROUP_NAME = 'common users'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Вывод тела письма в консоль
+
+# Celery Configuration Options
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
