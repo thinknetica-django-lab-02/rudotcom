@@ -11,7 +11,6 @@ from PIL import Image
 from .utils import path_and_rename, upload_avatar
 
 
-
 class Vendor(models.Model):
     """
     Продавец - одна из ролей класса User

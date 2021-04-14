@@ -1,7 +1,8 @@
 # Create your tasks here
 
 from celery import shared_task
-from main.models import Widget
+
+from main.models import Vendor
 
 
 @shared_task
@@ -21,11 +22,11 @@ def xsum(numbers):
 
 @shared_task
 def count_widgets():
-    return Widget.objects.count()
+    return Vendor.objects.count()
 
 
 @shared_task
-def rename_widget(widget_id, name):
-    w = Widget.objects.get(id=widget_id)
+def rename_vendor(vendor_id, name):
+    w = Vendor.objects.get(id=vendor_id)
     w.name = name
     w.save()
