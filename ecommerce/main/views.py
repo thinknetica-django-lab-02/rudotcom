@@ -7,10 +7,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, View, DetailView
 
-from .forms import UserForm, LoginForm, ItemUpdateForm
+from .forms import UserForm, LoginForm, ItemUpdateForm, FeedbackForm
 from .models import Category, Item, Article, Customer, Vendor
 from django.contrib.auth import get_user_model, login, authenticate
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import FormView
+from .forms import FeedbackForm
 
 User = get_user_model()
 
@@ -178,6 +180,16 @@ class SignUpView(CreateView):
 class CartView(View):
     """ Представление для корзины с товарами """
     pass
+
+
+class FeedbackView(FormView):
+    template_name = 'ecommerce/contact.html'
+    form_class = FeedbackForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        form.send_email()
+        return super(FeedbackView, self).form_valid(form)
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):

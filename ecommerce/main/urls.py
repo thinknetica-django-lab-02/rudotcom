@@ -19,6 +19,7 @@ urlpatterns = [
     path('sign-up/', views.SignUpView.as_view(), name='sign-up'),
     path('cart/', views.CartView.as_view(), name='cart'),
     path('accounts/', include('allauth.urls')),
+    path('feedback/', views.FeedbackView.as_view(), name='feedback'),
 ]
 
 if settings.DEBUG:

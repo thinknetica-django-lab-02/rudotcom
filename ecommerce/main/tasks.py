@@ -1,32 +1,13 @@
-# Create your tasks here
+from celery.decorators import task
+from celery.utils.log import get_task_logger
 
-from celery import shared_task
+from .emails import send_feedback_email
 
-from main.models import Vendor
-
-
-@shared_task
-def add(x, y):
-    return x + y
+logger = get_task_logger(__name__)
 
 
-@shared_task
-def mul(x, y):
-    return x * y
-
-
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
-
-
-@shared_task
-def count_widgets():
-    return Vendor.objects.count()
-
-
-@shared_task
-def rename_vendor(vendor_id, name):
-    w = Vendor.objects.get(id=vendor_id)
-    w.name = name
-    w.save()
+@task(name="send_feedback_email_task")
+def send_feedback_email_task(email, message):
+    """sends an email when feedback form is filled successfully"""
+    logger.info("Sent feedback email")
+    return send_feedback_email(email, message)
